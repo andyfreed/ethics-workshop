@@ -70,8 +70,8 @@ export default function ChapterRequestForm() {
 
   return (
     <div>
-      <Card className="backdrop-blur-sm bg-card/50 border border-border shadow-xl animate-fade-in">
-        <div className="px-6 py-6 sm:p-8 bg-gradient-to-r from-primary to-accent">
+      <Card className="border border-border shadow-md">
+        <div className="px-6 py-6 sm:p-8 bg-primary">
           <h1 className="text-2xl leading-6 font-bold text-primary-foreground">Chapter Request Form</h1>
           <p className="mt-2 text-primary-foreground/90">Request the Ethics Workshop for your FPA Chapter</p>
         </div>
@@ -227,7 +227,7 @@ export default function ChapterRequestForm() {
                   type="submit" 
                   size="lg"
                   disabled={mutation.isPending}
-                  className="bg-primary hover:bg-primary/90 shadow-lg hover:shadow-primary/20 text-white font-medium"
+                  className="bg-primary hover:bg-primary/90 text-white font-medium"
                 >
                   {mutation.isPending ? "Submitting..." : "Submit Request"}
                 </Button>
