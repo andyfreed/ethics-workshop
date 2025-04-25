@@ -19,7 +19,7 @@ const formSchema = z.object({
   contactPerson: z.string().min(1, "Contact person is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
-  anticipatedDate: z.string().min(1, "Anticipated date is required"),
+  preferredDate: z.string().min(1, "Anticipated date is required"),
   estimatedAttendees: z.coerce.number().min(1, "Must have at least 1 attendee"),
   instructorName: z.string().min(1, "Instructor name is required"),
   additionalInfo: z.string().optional(),
@@ -36,7 +36,7 @@ export default function ChapterRequestForm() {
       contactPerson: "",
       email: "",
       phone: "",
-      anticipatedDate: "",
+      preferredDate: "",
       estimatedAttendees: 0,
       instructorName: "",
       additionalInfo: "",
@@ -160,7 +160,7 @@ export default function ChapterRequestForm() {
                 <div className="sm:col-span-3">
                   <FormField
                     control={form.control}
-                    name="anticipatedDate"
+                    name="preferredDate"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Anticipated Workshop Date</FormLabel>
