@@ -34,16 +34,16 @@ export default function Header() {
     navLinks.push({ href: "/admin", label: "Admin Dashboard" });
   }
 
-  const activeLink = "border-primary text-primary whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm";
-  const inactiveLink = "border-transparent text-muted-foreground hover:text-foreground hover:border-border whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm";
+  const activeLink = "border-accent text-primary-foreground whitespace-nowrap pb-4 px-1 border-b-2 font-bold text-sm";
+  const inactiveLink = "border-transparent text-primary-foreground/80 hover:text-primary-foreground hover:border-primary-foreground/30 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm";
 
   return (
-    <header className="backdrop-blur-sm bg-background/90 border-b border-border sticky top-0 z-40">
+    <header className="bg-primary border-b border-primary/20 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <Link href="/">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent cursor-pointer">
+              <h1 className="text-2xl font-bold text-primary-foreground cursor-pointer">
                 CFP Ethics Workshop
               </h1>
             </Link>
@@ -64,7 +64,7 @@ export default function Header() {
           <div className="md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="text-primary-foreground">
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Open navigation menu</span>
                 </Button>
@@ -74,7 +74,7 @@ export default function Header() {
                   {navLinks.map((link) => (
                     <Link key={link.href} href={link.href}>
                       <span 
-                        className={`px-2 py-1 rounded hover:bg-secondary cursor-pointer ${location === link.href ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                        className={`px-3 py-2 rounded hover:bg-primary/10 cursor-pointer font-medium ${location === link.href ? 'text-accent font-bold' : 'text-foreground'}`}
                         onClick={() => setOpen(false)}
                       >
                         {link.label}

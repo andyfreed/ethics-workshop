@@ -26,31 +26,31 @@
 :root {
   /* Pure white background for Beacon Hill Financial Educators */
   --background: 0 0% 100%;
-  --foreground: 0 0% 13%; /* #222222 - dark gray for readability */
+  --foreground: 40 98% 5%; /* #191102 - deep black/brown for text */
   
   /* Light gray for secondary backgrounds */
   --muted: 0 0% 96%; /* #F5F5F5 - light gray */
-  --muted-foreground: 0 0% 45%; /* #737373 - mid gray for less important text */
+  --muted-foreground: 40 98% 25%; /* Lighter variant of main text color */
   
   /* Card and popover styling */
   --popover: 0 0% 100%; /* White */
-  --popover-foreground: 0 0% 13%; /* Same as main foreground */
+  --popover-foreground: 40 98% 5%; /* Same as main foreground */
   --card: 0 0% 100%; /* White */
-  --card-foreground: 0 0% 13%; /* Same as main foreground */
+  --card-foreground: 40 98% 5%; /* Same as main foreground */
   
   /* Soft gray borders and inputs */
   --border: 0 0% 87%; /* #DDDDDD - soft gray for borders */
   --input: 0 0% 87%; /* Same as border */
   
-  /* Deep navy blue for primary elements */
-  --primary: 203 100% 29%; /* #005693 - deep navy blue */
-  --primary-foreground: 0 0% 100%; /* White text on blue */
+  /* Gold/yellow for primary elements (headers, menu backgrounds) */
+  --primary: 44 100% 50%; /* #ffb300 - bright yellow/gold */
+  --primary-foreground: 40 98% 5%; /* Dark text on yellow/gold */
   
   /* Light gray for secondary elements */
   --secondary: 0 0% 96%; /* #F5F5F5 - light gray */
-  --secondary-foreground: 0 0% 13%; /* Dark text on light gray */
+  --secondary-foreground: 40 98% 5%; /* Dark text on light gray */
   
-  /* Bright orange for accents and call-to-action */
+  /* Bright orange for accents and call-to-action - keeping this */
   --accent: 28 93% 54%; /* #F7941E - bright orange */
   --accent-foreground: 0 0% 100%; /* White text on orange */
   
@@ -81,35 +81,35 @@
 }
 
 .dark {
-  /* Dark mode equivalent for Beacon Hill Financial Educators */
-  --background: 220 20% 13%; /* Dark navy background */
-  --foreground: 0 0% 95%; /* Light text for readability on dark */
+  /* Dark mode equivalent with new color scheme */
+  --background: 40 30% 10%; /* Dark brown background */
+  --foreground: 44 90% 80%; /* Light gold text for readability on dark */
   
   /* Darker muted colors */
-  --muted: 220 20% 20%; /* Darker navy for secondary backgrounds */
-  --muted-foreground: 0 0% 75%; /* Lighter gray for less important text */
+  --muted: 40 30% 15%; /* Darker brown for secondary backgrounds */
+  --muted-foreground: 44 60% 70%; /* Lighter gold for less important text */
   
   /* Dark card and popover styling */
-  --popover: 220 20% 13%; /* Same as background */
-  --popover-foreground: 0 0% 95%; /* Same as main foreground */
-  --card: 220 20% 15%; /* Slightly lighter than background */
-  --card-foreground: 0 0% 95%; /* Same as main foreground */
+  --popover: 40 30% 10%; /* Same as background */
+  --popover-foreground: 44 90% 80%; /* Same as main foreground */
+  --card: 40 30% 12%; /* Slightly lighter than background */
+  --card-foreground: 44 90% 80%; /* Same as main foreground */
   
   /* Borders and inputs */
-  --border: 220 20% 25%; /* Visible but not harsh borders */
-  --input: 220 20% 25%; /* Same as border */
+  --border: 40 30% 25%; /* Visible but not harsh borders */
+  --input: 40 30% 25%; /* Same as border */
   
-  /* More vibrant navy blue for primary elements in dark mode */
-  --primary: 203 80% 40%; /* Brighter navy blue */
-  --primary-foreground: 0 0% 100%; /* White text */
+  /* Bright gold for primary elements in dark mode */
+  --primary: 44 100% 45%; /* Slightly darker gold for dark mode */
+  --primary-foreground: 40 98% 5%; /* Dark text on gold */
   
   /* Secondary elements - slightly lighter than background */
-  --secondary: 220 20% 20%; /* Darker navy */
-  --secondary-foreground: 0 0% 95%; /* Light text */
+  --secondary: 40 30% 20%; /* Darker brown */
+  --secondary-foreground: 44 90% 80%; /* Light gold text */
   
   /* Brighter orange for accents - stands out in dark mode */
   --accent: 28 100% 60%; /* Brighter orange for dark mode */
-  --accent-foreground: 0 0% 10%; /* Dark text on bright orange */
+  --accent-foreground: 40 98% 5%; /* Dark text on bright orange */
   
   /* Alert and error states */
   --destructive: 0 90% 60%; /* Brighter red for dark mode */

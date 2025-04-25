@@ -19,12 +19,12 @@ export default function Home() {
           </div>
           <div className="space-x-4">
             <Link href="/course-description">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
                 Learn More <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/chapter-request">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white">
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white font-bold">
                 Request Workshop
               </Button>
             </Link>
@@ -78,8 +78,8 @@ export default function Home() {
 
       <section className="rounded-lg border border-border shadow-md overflow-hidden mt-12">
         <div className="px-6 py-6 sm:p-8 bg-primary">
-          <h2 className="text-2xl leading-6 font-bold text-white">Ready to Get Started?</h2>
-          <p className="mt-2 text-white/90">
+          <h2 className="text-2xl leading-6 font-bold text-primary-foreground">Ready to Get Started?</h2>
+          <p className="mt-2 text-primary-foreground/90">
             Follow these simple steps to bring the Ethics Workshop to your FPA Chapter
           </p>
         </div>
@@ -109,7 +109,7 @@ export default function Home() {
           
           <div className="mt-8 flex justify-center">
             <Link href="/chapter-request">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white">
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white font-bold">
                 Request the CFP Ethics Workshop <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
