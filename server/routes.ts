@@ -166,6 +166,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ message: "Chapter request not found" });
     }
     
+    // Sync the updated chapter request to Supabase
+    try {
+      await syncChapterRequestToSupabase(updatedRequest);
+    } catch (syncErr) {
+      console.error('Error syncing updated chapter request to Supabase:', syncErr);
+      // Continue with the response even if sync fails
+    }
+    
     res.json(updatedRequest);
   });
   

@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { syncAllDataToSupabase, supabase } from "./supabaseSync";
 
 const app = express();
 app.use(express.json());
@@ -54,6 +55,22 @@ app.use((req, res, next) => {
     await setupVite(app, server);
   } else {
     serveStatic(app);
+  }
+
+  // Check Supabase configuration
+  if (supabase) {
+    log("Supabase client initialized successfully");
+    
+    // Attempt initial sync of all data to Supabase
+    try {
+      await syncAllDataToSupabase();
+      log("Initial data sync to Supabase completed");
+    } catch (err) {
+      console.error("Failed to perform initial Supabase sync:", err);
+    }
+  } else {
+    console.warn("Supabase client not available. Data will not be synced to Supabase.");
+    console.warn("Set SUPABASE_URL and SUPABASE_ANON_KEY environment variables to enable Supabase integration.");
   }
 
   // ALWAYS serve the app on port 5000
