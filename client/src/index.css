@@ -2,40 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .delay-100 {
+    animation-delay: 0.1s;
+  }
+  .delay-200 {
+    animation-delay: 0.2s;
+  }
+  .delay-300 {
+    animation-delay: 0.3s;
+  }
+  .delay-400 {
+    animation-delay: 0.4s;
+  }
+  .delay-500 {
+    animation-delay: 0.5s;
+  }
+  .delay-600 {
+    animation-delay: 0.6s;
+  }
+}
+
 :root {
-  --background: 215 30% 12%;
+  /* Dark navy background, perfect for Bond sophistication */
+  --background: 220 35% 10%;
   --foreground: 210 40% 98%;
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
-  --popover: 215 30% 12%;
+  
+  /* Darker muted colors for subtle UI elements */
+  --muted: 220 33% 15%;
+  --muted-foreground: 210 20% 75%;
+  
+  /* Popover and card with slight blue tint */
+  --popover: 220 30% 12%;
   --popover-foreground: 210 40% 98%;
-  --card: 215 30% 15%;
+  --card: 220 30% 13%;
   --card-foreground: 210 40% 98%;
-  --border: 217 33% 20%;
-  --input: 217 33% 20%;
-  --primary: 199 70% 50%;
+  
+  /* Subtle borders and inputs */
+  --border: 220 30% 18%;
+  --input: 220 30% 18%;
+  
+  /* Rich electric blue - Bond's tech elements */
+  --primary: 210 100% 55%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 215 25% 27%;
+  
+  /* Darker secondary for controls */
+  --secondary: 220 25% 20%;
   --secondary-foreground: 210 40% 98%;
-  --accent: 30 80% 50%;
+  
+  /* Golden accent - classic Bond luxury */
+  --accent: 35 90% 55%;
   --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 50.6%;
+  
+  /* Alert and error states */
+  --destructive: 0 80% 50%;
   --destructive-foreground: 210 40% 98%;
-  --ring: 199 70% 50%;
-  --radius: 0.5rem;
-  --chart-1: 199 70% 50%;
-  --chart-2: 150 70% 48%;
-  --chart-3: 30 80% 50%;
-  --chart-4: 270 70% 48%;
-  --chart-5: 350 70% 48%;
-  --sidebar-background: 220 40% 10%;
+  
+  /* Focus rings and outlines */
+  --ring: 210 100% 55%;
+  --radius: 0.4rem;
+  
+  /* Chart colors - sophisticated palette */
+  --chart-1: 210 100% 55%;
+  --chart-2: 190 80% 50%;
+  --chart-3: 35 90% 55%;
+  --chart-4: 250 70% 55%;
+  --chart-5: 330 70% 50%;
+  
+  /* Sidebar styling - darker than main UI */
+  --sidebar-background: 225 40% 8%;
   --sidebar-foreground: 210 40% 98%;
-  --sidebar-primary: 199 70% 50%;
+  --sidebar-primary: 210 100% 55%;
   --sidebar-primary-foreground: 210 40% 98%;
-  --sidebar-accent: 220 40% 16%;
+  --sidebar-accent: 225 40% 14%;
   --sidebar-accent-foreground: 210 40% 98%;
-  --sidebar-border: 217 33% 25%;
-  --sidebar-ring: 199 70% 50%;
+  --sidebar-border: 225 30% 20%;
+  --sidebar-ring: 210 100% 55%;
 }
 
 .dark {
@@ -68,5 +110,42 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    background-image: 
+      radial-gradient(circle at 100% 0%, hsla(var(--primary)/0.05) 0%, transparent 40%),
+      radial-gradient(circle at 0% 100%, hsla(var(--accent)/0.05) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  /* Elegant, Bond-like scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/30 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/30 rounded-full hover:bg-primary/50 transition-colors;
+  }
+
+  /* Button hover effects */
+  .btn, button {
+    @apply transition-all duration-200;
+  }
+
+  /* Link styling */
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* Focus styling */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring/70 ring-offset-2 ring-offset-background;
+  }
+  
+  /* Card hover effects */
+  .card {
+    @apply transition-all duration-300;
   }
 }
