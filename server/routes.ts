@@ -322,6 +322,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ success: false, message: "Failed to sync data to Supabase" });
     }
   });
+  
+  // Serve the SQL setup file
+  app.get('/supabase_setup.sql', (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    const filePath = path.join(process.cwd(), 'supabase_setup.sql');
+    
+    try {
+      if (fs.existsSync(filePath)) {
+        const sqlContent = fs.readFileSync(filePath, 'utf8');
+        res.setHeader('Content-Type', 'text/plain');
+        res.send(sqlContent);
+      } else {
+        res.status(404).send('SQL setup file not found');
+      }
+    } catch (err) {
+      console.error('Error serving SQL file:', err);
+      res.status(500).send('Error reading SQL file');
+    }
+  });
 
   return httpServer;
 }

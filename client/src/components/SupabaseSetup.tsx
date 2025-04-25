@@ -39,10 +39,7 @@ export default function SupabaseSetup() {
       setSyncResult(null);
       setSyncSuccess(null);
       
-      const response = await apiRequest('/api/sync/supabase', {
-        method: 'POST',
-        body: {}
-      });
+      const response = await apiRequest('POST', '/api/sync/supabase');
       
       setSyncResult('Data successfully synced to Supabase!');
       setSyncSuccess(true);
@@ -144,7 +141,7 @@ export default function SupabaseSetup() {
               
               <div className="flex items-center space-x-2 text-gray-400">
                 <Database className="h-5 w-5" />
-                <span>Sync to: {process.env.SUPABASE_URL ? process.env.SUPABASE_URL.substring(0, 25) + '...' : 'Supabase URL not set'}</span>
+                <span>Sync to: Supabase database</span>
               </div>
             </div>
           </CardContent>
