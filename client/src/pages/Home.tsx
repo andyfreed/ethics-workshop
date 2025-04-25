@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, Calendar, ClipboardCheck } from "lucide-react";
+import { ArrowRight, Award, DollarSign, ClipboardCheck } from "lucide-react";
 
 export default function Home() {
   return (
@@ -50,13 +50,13 @@ export default function Home() {
         <Card className="border border-border shadow-md">
           <CardContent className="p-6">
             <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 text-primary mb-6">
-              <Calendar className="h-8 w-8" />
+              <DollarSign className="h-8 w-8" />
             </div>
             <h2 className="text-xl font-semibold mb-3 text-primary">
-              Flexible Scheduling
+              Transparent Pricing
             </h2>
             <p className="text-muted-foreground">
-              We work with your FPA Chapter to find a date and time that works best for your members.
+              $995 flat fee per workshop for FPA Chapters, with no additional per-attendee charges.
             </p>
           </CardContent>
         </Card>
