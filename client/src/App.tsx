@@ -12,6 +12,7 @@ import ChapterRequestForm from "@/pages/ChapterRequestForm";
 import ParticipantSignIn from "@/pages/ParticipantSignIn";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
+import SupabaseSetup from "@/components/SupabaseSetup";
 
 function Router() {
   return (
@@ -25,6 +26,7 @@ function Router() {
         <Route path="/admin/workshop-sessions" component={AdminDashboard} />
         <Route path="/admin/chapter-requests" component={AdminDashboard} />
         <Route path="/admin/participant-data" component={AdminDashboard} />
+        <Route path="/admin/supabase-setup" component={SupabaseSetup} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
