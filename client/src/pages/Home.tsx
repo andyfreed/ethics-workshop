@@ -6,23 +6,27 @@ import { ArrowRight, Award, Calendar, ClipboardCheck } from "lucide-react";
 export default function Home() {
   return (
     <div className="space-y-8">
-      <section className="bg-white shadow rounded-lg p-6 sm:p-10">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Ethics Workshop Management Portal
-          </h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Our CFP Board-approved workshop helps financial professionals meet ethics CE requirements
-            with interactive, real-world case discussions.
-          </p>
-          <div className="space-x-4">
+      <section className="p-6 sm:p-10 rounded-lg backdrop-blur-sm bg-card/90 border border-border shadow-xl">
+        <div className="max-w-3xl mx-auto text-center relative">
+          <div className="mb-8">
+            <h1 className="text-3xl sm:text-5xl font-bold mb-4 animate-fade-in">
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Ethics Workshop Management Portal
+              </span>
+            </h1>
+            <p className="text-lg text-muted-foreground mb-8 animate-fade-up delay-200">
+              Our CFP Board-approved workshop helps financial professionals meet ethics CE requirements
+              with interactive, real-world case discussions.
+            </p>
+          </div>
+          <div className="space-x-4 animate-fade-up delay-300">
             <Link href="/course-description">
-              <Button className="bg-primary-500 hover:bg-primary-600">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-lg hover:shadow-primary/20">
                 Learn More <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/chapter-request">
-              <Button variant="outline">
+              <Button size="lg" variant="outline" className="border-border hover:bg-secondary">
                 Request Workshop
               </Button>
             </Link>

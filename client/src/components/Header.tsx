@@ -34,16 +34,16 @@ export default function Header() {
     navLinks.push({ href: "/admin", label: "Admin Dashboard" });
   }
 
-  const activeLink = "border-primary-500 text-primary-500 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm";
-  const inactiveLink = "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm";
+  const activeLink = "border-primary text-primary whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm";
+  const inactiveLink = "border-transparent text-muted-foreground hover:text-foreground hover:border-border whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm";
 
   return (
-    <header className="bg-white shadow">
+    <header className="backdrop-blur-sm bg-background/90 border-b border-border sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <Link href="/">
-              <h1 className="text-2xl font-bold text-primary-500 cursor-pointer">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent cursor-pointer">
                 Ethics Workshop Management Portal
               </h1>
             </Link>
@@ -74,7 +74,7 @@ export default function Header() {
                   {navLinks.map((link) => (
                     <Link key={link.href} href={link.href}>
                       <span 
-                        className={`px-2 py-1 rounded hover:bg-gray-100 cursor-pointer ${location === link.href ? 'text-primary-500 font-medium' : 'text-gray-700'}`}
+                        className={`px-2 py-1 rounded hover:bg-secondary cursor-pointer ${location === link.href ? 'text-primary font-medium' : 'text-muted-foreground'}`}
                         onClick={() => setOpen(false)}
                       >
                         {link.label}
