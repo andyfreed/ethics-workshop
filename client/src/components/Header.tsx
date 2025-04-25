@@ -53,9 +53,9 @@ export default function Header() {
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
-                <a className={location === link.href ? activeLink : inactiveLink}>
+                <span className={location === link.href ? activeLink : inactiveLink}>
                   {link.label}
-                </a>
+                </span>
               </Link>
             ))}
           </div>
@@ -73,12 +73,12 @@ export default function Header() {
                 <nav className="flex flex-col space-y-4 mt-6">
                   {navLinks.map((link) => (
                     <Link key={link.href} href={link.href}>
-                      <a 
-                        className={`px-2 py-1 rounded hover:bg-gray-100 ${location === link.href ? 'text-primary-500 font-medium' : 'text-gray-700'}`}
+                      <span 
+                        className={`px-2 py-1 rounded hover:bg-gray-100 cursor-pointer ${location === link.href ? 'text-primary-500 font-medium' : 'text-gray-700'}`}
                         onClick={() => setOpen(false)}
                       >
                         {link.label}
-                      </a>
+                      </span>
                     </Link>
                   ))}
                 </nav>
