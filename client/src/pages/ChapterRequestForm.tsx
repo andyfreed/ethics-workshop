@@ -19,8 +19,7 @@ const formSchema = z.object({
   contactPerson: z.string().min(1, "Contact person is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
-  preferredDate: z.string().min(1, "Preferred date is required"),
-  alternateDate: z.string().optional(),
+  anticipatedDate: z.string().min(1, "Anticipated date is required"),
   estimatedAttendees: z.coerce.number().min(1, "Must have at least 1 attendee"),
   instructorName: z.string().min(1, "Instructor name is required"),
   additionalInfo: z.string().optional(),
@@ -37,8 +36,7 @@ export default function ChapterRequestForm() {
       contactPerson: "",
       email: "",
       phone: "",
-      preferredDate: "",
-      alternateDate: "",
+      anticipatedDate: "",
       estimatedAttendees: 0,
       instructorName: "",
       additionalInfo: "",
@@ -72,17 +70,21 @@ export default function ChapterRequestForm() {
 
   return (
     <div>
-      <Card>
-        <div className="px-4 py-5 sm:px-6 bg-gradient-to-r from-primary-500 to-primary-600">
-          <h1 className="text-xl leading-6 font-bold text-white">Chapter Request Form</h1>
-          <p className="mt-1 max-w-2xl text-sm text-white opacity-90">Request the Ethics Workshop for your FPA Chapter</p>
+      <Card className="backdrop-blur-sm bg-card/50 border border-border shadow-xl animate-fade-in">
+        <div className="px-6 py-6 sm:p-8 bg-gradient-to-r from-primary to-accent">
+          <h1 className="text-2xl leading-6 font-bold text-primary-foreground">Chapter Request Form</h1>
+          <p className="mt-2 text-primary-foreground/90">Request the Ethics Workshop for your FPA Chapter</p>
         </div>
-        <CardContent className="px-4 py-5 sm:p-6">
+        <CardContent className="px-6 py-6 sm:p-8">
           {isSuccess && (
-            <Alert className="mb-6 bg-green-50 border-green-200">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-800">Request Submitted Successfully</AlertTitle>
-              <AlertDescription className="text-green-700">
+            <Alert className="mb-8 bg-primary/10 border-primary/20">
+              <div className="flex items-center gap-2">
+                <div className="p-1 rounded-full bg-primary/10">
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                </div>
+                <AlertTitle className="text-xl font-semibold">Request Submitted Successfully</AlertTitle>
+              </div>
+              <AlertDescription className="mt-3 text-muted-foreground">
                 Thank you for your interest in the Ethics Workshop. We'll review your request and get back to you within 2 business days to confirm details and provide next steps.
               </AlertDescription>
             </Alert>
@@ -158,26 +160,10 @@ export default function ChapterRequestForm() {
                 <div className="sm:col-span-3">
                   <FormField
                     control={form.control}
-                    name="preferredDate"
+                    name="anticipatedDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Preferred Workshop Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="sm:col-span-3">
-                  <FormField
-                    control={form.control}
-                    name="alternateDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Alternate Date</FormLabel>
+                        <FormLabel>Anticipated Workshop Date</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} />
                         </FormControl>
@@ -236,11 +222,12 @@ export default function ChapterRequestForm() {
                 </div>
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-end mt-8">
                 <Button 
                   type="submit" 
+                  size="lg"
                   disabled={mutation.isPending}
-                  className="bg-primary-500 hover:bg-primary-600"
+                  className="bg-primary hover:bg-primary/90 shadow-lg hover:shadow-primary/20 text-white font-medium"
                 >
                   {mutation.isPending ? "Submitting..." : "Submit Request"}
                 </Button>
