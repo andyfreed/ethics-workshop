@@ -24,83 +24,100 @@
 }
 
 :root {
-  /* Dark navy background, perfect for Bond sophistication */
-  --background: 220 35% 10%;
-  --foreground: 210 40% 98%;
+  /* Pure white background for Beacon Hill Financial Educators */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 13%; /* #222222 - dark gray for readability */
   
-  /* Darker muted colors for subtle UI elements */
-  --muted: 220 33% 15%;
-  --muted-foreground: 210 20% 75%;
+  /* Light gray for secondary backgrounds */
+  --muted: 0 0% 96%; /* #F5F5F5 - light gray */
+  --muted-foreground: 0 0% 45%; /* #737373 - mid gray for less important text */
   
-  /* Popover and card with slight blue tint */
-  --popover: 220 30% 12%;
-  --popover-foreground: 210 40% 98%;
-  --card: 220 30% 13%;
-  --card-foreground: 210 40% 98%;
+  /* Card and popover styling */
+  --popover: 0 0% 100%; /* White */
+  --popover-foreground: 0 0% 13%; /* Same as main foreground */
+  --card: 0 0% 100%; /* White */
+  --card-foreground: 0 0% 13%; /* Same as main foreground */
   
-  /* Subtle borders and inputs */
-  --border: 220 30% 18%;
-  --input: 220 30% 18%;
+  /* Soft gray borders and inputs */
+  --border: 0 0% 87%; /* #DDDDDD - soft gray for borders */
+  --input: 0 0% 87%; /* Same as border */
   
-  /* Rich electric blue - Bond's tech elements */
-  --primary: 210 100% 55%;
-  --primary-foreground: 210 40% 98%;
+  /* Deep navy blue for primary elements */
+  --primary: 203 100% 29%; /* #005693 - deep navy blue */
+  --primary-foreground: 0 0% 100%; /* White text on blue */
   
-  /* Darker secondary for controls */
-  --secondary: 220 25% 20%;
-  --secondary-foreground: 210 40% 98%;
+  /* Light gray for secondary elements */
+  --secondary: 0 0% 96%; /* #F5F5F5 - light gray */
+  --secondary-foreground: 0 0% 13%; /* Dark text on light gray */
   
-  /* Golden accent - classic Bond luxury */
-  --accent: 35 90% 55%;
-  --accent-foreground: 210 40% 98%;
+  /* Bright orange for accents and call-to-action */
+  --accent: 28 93% 54%; /* #F7941E - bright orange */
+  --accent-foreground: 0 0% 100%; /* White text on orange */
   
   /* Alert and error states */
-  --destructive: 0 80% 50%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%; /* #EE3A39 - red */
+  --destructive-foreground: 0 0% 100%; /* White text on red */
   
   /* Focus rings and outlines */
-  --ring: 210 100% 55%;
+  --ring: 203 100% 29%; /* Navy blue for focus rings */
   --radius: 0.4rem;
   
-  /* Chart colors - sophisticated palette */
-  --chart-1: 210 100% 55%;
-  --chart-2: 190 80% 50%;
-  --chart-3: 35 90% 55%;
-  --chart-4: 250 70% 55%;
-  --chart-5: 330 70% 50%;
+  /* Chart colors - professional palette */
+  --chart-1: 203 100% 29%; /* Navy */
+  --chart-2: 28 93% 54%; /* Orange */
+  --chart-3: 0 0% 87%; /* Gray */
+  --chart-4: 203 80% 40%; /* Lighter blue */
+  --chart-5: 28 80% 70%; /* Lighter orange */
   
-  /* Sidebar styling - darker than main UI */
-  --sidebar-background: 225 40% 8%;
-  --sidebar-foreground: 210 40% 98%;
-  --sidebar-primary: 210 100% 55%;
-  --sidebar-primary-foreground: 210 40% 98%;
-  --sidebar-accent: 225 40% 14%;
-  --sidebar-accent-foreground: 210 40% 98%;
-  --sidebar-border: 225 30% 20%;
-  --sidebar-ring: 210 100% 55%;
+  /* Sidebar styling */
+  --sidebar-background: 203 30% 95%; /* Very light blue */
+  --sidebar-foreground: 0 0% 13%; /* Dark text */
+  --sidebar-primary: 203 100% 29%; /* Navy blue */
+  --sidebar-primary-foreground: 0 0% 100%; /* White text */
+  --sidebar-accent: 28 93% 54%; /* Orange accent */
+  --sidebar-accent-foreground: 0 0% 100%; /* White text */
+  --sidebar-border: 0 0% 87%; /* Same soft gray border */
+  --sidebar-ring: 203 100% 29%; /* Navy blue ring */
 }
 
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --primary: 214 90% 48%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --ring: 240 4.9% 83.9%;
-  --radius: 0.5rem;
+  /* Dark mode equivalent for Beacon Hill Financial Educators */
+  --background: 220 20% 13%; /* Dark navy background */
+  --foreground: 0 0% 95%; /* Light text for readability on dark */
+  
+  /* Darker muted colors */
+  --muted: 220 20% 20%; /* Darker navy for secondary backgrounds */
+  --muted-foreground: 0 0% 75%; /* Lighter gray for less important text */
+  
+  /* Dark card and popover styling */
+  --popover: 220 20% 13%; /* Same as background */
+  --popover-foreground: 0 0% 95%; /* Same as main foreground */
+  --card: 220 20% 15%; /* Slightly lighter than background */
+  --card-foreground: 0 0% 95%; /* Same as main foreground */
+  
+  /* Borders and inputs */
+  --border: 220 20% 25%; /* Visible but not harsh borders */
+  --input: 220 20% 25%; /* Same as border */
+  
+  /* More vibrant navy blue for primary elements in dark mode */
+  --primary: 203 80% 40%; /* Brighter navy blue */
+  --primary-foreground: 0 0% 100%; /* White text */
+  
+  /* Secondary elements - slightly lighter than background */
+  --secondary: 220 20% 20%; /* Darker navy */
+  --secondary-foreground: 0 0% 95%; /* Light text */
+  
+  /* Brighter orange for accents - stands out in dark mode */
+  --accent: 28 100% 60%; /* Brighter orange for dark mode */
+  --accent-foreground: 0 0% 10%; /* Dark text on bright orange */
+  
+  /* Alert and error states */
+  --destructive: 0 90% 60%; /* Brighter red for dark mode */
+  --destructive-foreground: 0 0% 100%; /* White text */
+  
+  /* Focus rings and outlines */
+  --ring: 203 80% 40%; /* Brighter navy ring */
+  --radius: 0.4rem;
 }
 
 @layer base {
