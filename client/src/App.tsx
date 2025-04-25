@@ -22,6 +22,7 @@ function Router() {
         <Route path="/course-description" component={CourseDescription} />
         <Route path="/chapter-request" component={ChapterRequestForm} />
         <Route path="/participant-signin" component={ParticipantSignIn} />
+        <Route path="/supabase-setup" component={SupabaseSetup} />
         <Route path="/admin" component={AdminDashboard} />
         <Route path="/admin/workshop-sessions" component={AdminDashboard} />
         <Route path="/admin/chapter-requests" component={AdminDashboard} />

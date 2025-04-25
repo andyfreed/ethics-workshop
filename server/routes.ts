@@ -312,8 +312,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send(csvContent);
   });
   
-  // Sync data to Supabase (admin only)
-  app.post('/api/sync/supabase', isAdmin, async (req, res) => {
+  // Sync data to Supabase (no auth required)
+  app.post('/api/sync/supabase', async (req, res) => {
     try {
       await syncAllDataToSupabase();
       res.json({ success: true, message: "Data successfully synced to Supabase" });

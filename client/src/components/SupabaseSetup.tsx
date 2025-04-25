@@ -203,7 +203,6 @@ export default function SupabaseSetup() {
                     </ul>
                   </li>
                   <li>The service role key (preferred) has more permissions than the anon key</li>
-                  <li>You must be logged in as an admin to use this function</li>
                 </ul>
               </div>
               
