@@ -46,7 +46,7 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
 
 // Send chapter request notification email
 export async function sendChapterRequestNotification(chapterRequest: ChapterRequest): Promise<boolean> {
-  const to = 'a.freed@outlook.com'; // Your email address
+  const to = 'ops@bhfe.com'; // Your email address
   // Use a from address that's verified in your SendGrid account
   const from = 'notifications@cfpethicsworkshop.com'; 
   const subject = `New Chapter Request: ${chapterRequest.chapterName}`;
