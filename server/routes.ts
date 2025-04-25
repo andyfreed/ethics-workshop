@@ -14,6 +14,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import crypto from "crypto";
 import MemoryStore from "memorystore";
 import { syncChapterRequestToSupabase, syncAllDataToSupabase } from "./supabaseSync";
+import { sendChapterRequestNotification } from "./email";
 
 // Helper to handle zod validation errors
 function handleZodError(err: unknown, res: Response) {
@@ -144,6 +145,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (syncErr) {
         console.error('Error syncing to Supabase:', syncErr);
         // Continue with the response even if sync fails
+      }
+      
+      // Send email notification
+      try {
+        const emailSent = await sendChapterRequestNotification(newRequest);
+        if (emailSent) {
+          console.log('Chapter request notification email sent successfully');
+        } else {
+          console.warn('Failed to send chapter request notification email');
+        }
+      } catch (emailErr) {
+        console.error('Error sending email notification:', emailErr);
+        // Continue with the response even if email fails
       }
       
       res.status(201).json(newRequest);
