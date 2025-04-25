@@ -2,8 +2,11 @@ import {
   User, InsertUser, 
   ChapterRequest, InsertChapterRequest,
   WorkshopSession, InsertWorkshopSession,
-  Participant, InsertParticipant
+  Participant, InsertParticipant,
+  users, chapterRequests, workshopSessions, participants
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, or } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -32,168 +35,147 @@ export interface IStorage {
   getParticipantById(id: number): Promise<Participant | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private chapterRequests: Map<number, ChapterRequest>;
-  private workshopSessions: Map<number, WorkshopSession>;
-  private participants: Map<number, Participant>;
-  
-  private currentUserId: number;
-  private currentRequestId: number;
-  private currentSessionId: number;
-  private currentParticipantId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.chapterRequests = new Map();
-    this.workshopSessions = new Map();
-    this.participants = new Map();
-    
-    this.currentUserId = 1;
-    this.currentRequestId = 1;
-    this.currentSessionId = 1;
-    this.currentParticipantId = 1;
-    
-    // Add admin user by default
-    this.createUser({
-      username: "admin",
-      password: "password",
-      isAdmin: true
-    });
-  }
-
+// Database Storage Implementation
+export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result.length > 0 ? result[0] : undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const result = await db.select().from(users).where(eq(users.username, username));
+    return result.length > 0 ? result[0] : undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+    const result = await db.insert(users).values(insertUser).returning();
+    return result[0];
   }
   
   // Chapter Request methods
   async getChapterRequests(): Promise<ChapterRequest[]> {
-    return Array.from(this.chapterRequests.values());
+    return await db.select().from(chapterRequests);
   }
   
   async getChapterRequestById(id: number): Promise<ChapterRequest | undefined> {
-    return this.chapterRequests.get(id);
+    const result = await db.select().from(chapterRequests).where(eq(chapterRequests.id, id));
+    return result.length > 0 ? result[0] : undefined;
   }
   
   async createChapterRequest(request: InsertChapterRequest): Promise<ChapterRequest> {
-    const id = this.currentRequestId++;
-    const now = new Date();
-    const chapterRequest: ChapterRequest = { 
-      ...request, 
-      id, 
-      status: "pending", 
-      createdAt: now 
-    };
-    this.chapterRequests.set(id, chapterRequest);
-    return chapterRequest;
+    const result = await db.insert(chapterRequests)
+      .values({
+        ...request,
+        status: "pending",
+        createdAt: new Date()
+      })
+      .returning();
+    return result[0];
   }
   
   async updateChapterRequestStatus(id: number, status: string): Promise<ChapterRequest | undefined> {
-    const request = this.chapterRequests.get(id);
-    if (!request) return undefined;
-    
-    const updatedRequest = { ...request, status };
-    this.chapterRequests.set(id, updatedRequest);
-    return updatedRequest;
+    const result = await db.update(chapterRequests)
+      .set({ status })
+      .where(eq(chapterRequests.id, id))
+      .returning();
+    return result.length > 0 ? result[0] : undefined;
   }
   
   // Workshop Session methods
   async getWorkshopSessions(): Promise<WorkshopSession[]> {
-    return Array.from(this.workshopSessions.values());
+    return await db.select().from(workshopSessions);
   }
   
   async getWorkshopSessionById(id: number): Promise<WorkshopSession | undefined> {
-    return this.workshopSessions.get(id);
+    const result = await db.select().from(workshopSessions).where(eq(workshopSessions.id, id));
+    return result.length > 0 ? result[0] : undefined;
   }
   
   async createWorkshopSession(session: InsertWorkshopSession): Promise<WorkshopSession> {
-    const id = this.currentSessionId++;
-    const now = new Date();
-    const workshopSession: WorkshopSession = { 
-      ...session, 
-      id, 
-      status: "upcoming", 
-      reportedToCfpBoard: false, 
-      createdAt: now 
-    };
-    this.workshopSessions.set(id, workshopSession);
-    return workshopSession;
+    const result = await db.insert(workshopSessions)
+      .values({
+        ...session,
+        status: "upcoming",
+        reportedToCfpBoard: false,
+        createdAt: new Date()
+      })
+      .returning();
+    return result[0];
   }
   
   async updateWorkshopSessionStatus(id: number, status: string): Promise<WorkshopSession | undefined> {
-    const session = this.workshopSessions.get(id);
-    if (!session) return undefined;
-    
-    const updatedSession = { ...session, status };
-    this.workshopSessions.set(id, updatedSession);
-    return updatedSession;
+    const result = await db.update(workshopSessions)
+      .set({ status })
+      .where(eq(workshopSessions.id, id))
+      .returning();
+    return result.length > 0 ? result[0] : undefined;
   }
   
   async markWorkshopSessionReported(id: number, reported: boolean): Promise<WorkshopSession | undefined> {
-    const session = this.workshopSessions.get(id);
-    if (!session) return undefined;
-    
-    const updatedSession = { ...session, reportedToCfpBoard: reported };
-    this.workshopSessions.set(id, updatedSession);
-    return updatedSession;
+    const result = await db.update(workshopSessions)
+      .set({ reportedToCfpBoard: reported })
+      .where(eq(workshopSessions.id, id))
+      .returning();
+    return result.length > 0 ? result[0] : undefined;
   }
   
   // Participant methods
   async getParticipants(): Promise<Participant[]> {
-    return Array.from(this.participants.values());
+    return await db.select().from(participants);
   }
   
   async getParticipantsBySessionId(sessionId: number): Promise<Participant[]> {
-    return Array.from(this.participants.values()).filter(
-      (participant) => participant.sessionId === sessionId
-    );
+    return await db.select().from(participants).where(eq(participants.sessionId, sessionId));
   }
   
   async createParticipant(participant: InsertParticipant): Promise<Participant> {
-    const id = this.currentParticipantId++;
-    const now = new Date();
-    const newParticipant: Participant = { 
-      ...participant, 
-      id, 
-      reportedToCfpBoard: false, 
-      createdAt: now 
-    };
-    this.participants.set(id, newParticipant);
-    return newParticipant;
+    const result = await db.insert(participants)
+      .values({
+        ...participant,
+        reportedToCfpBoard: false,
+        createdAt: new Date()
+      })
+      .returning();
+    return result[0];
   }
   
   async markParticipantsReported(ids: number[]): Promise<number> {
-    let count = 0;
+    if (ids.length === 0) return 0;
     
-    ids.forEach(id => {
-      const participant = this.participants.get(id);
-      if (participant) {
-        const updatedParticipant = { ...participant, reportedToCfpBoard: true };
-        this.participants.set(id, updatedParticipant);
-        count++;
-      }
-    });
+    // Update participants where id is in the ids array
+    const result = await db.update(participants)
+      .set({ reportedToCfpBoard: true })
+      .where(
+        ids.map(id => eq(participants.id, id)).reduce((prev, curr) => or(prev, curr))
+      )
+      .returning();
     
-    return count;
+    return result.length;
   }
   
   async getParticipantById(id: number): Promise<Participant | undefined> {
-    return this.participants.get(id);
+    const result = await db.select().from(participants).where(eq(participants.id, id));
+    return result.length > 0 ? result[0] : undefined;
   }
 }
 
-export const storage = new MemStorage();
+// Initialize admin user if it doesn't exist
+async function initializeDatabase() {
+  const adminCheck = await db.select().from(users).where(eq(users.username, "admin"));
+  
+  if (adminCheck.length === 0) {
+    await db.insert(users).values({
+      username: "admin",
+      password: "password", // Note: In production, use password hashing
+      isAdmin: true
+    });
+    console.log("Admin user created successfully");
+  }
+}
+
+// Export storage instance
+export const storage = new DatabaseStorage();
+initializeDatabase().catch(err => {
+  console.error("Failed to initialize database:", err);
+});
