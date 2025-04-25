@@ -10,7 +10,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto text-center relative">
           <div className="mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-primary">
-              Ethics Workshop Management Portal
+              CFP Ethics Workshop
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
               Our CFP Board-approved workshop helps financial professionals meet ethics CE requirements
@@ -86,7 +86,7 @@ export default function Home() {
         <div className="px-6 py-8 sm:p-8 space-y-6">
           <ol className="space-y-6 text-foreground">
             {[
-              { title: "Request the Workshop", desc: "Complete our simple request form with your chapter details and preferred dates." },
+              { title: "Request the CFP Ethics Workshop", desc: "Complete our simple request form with your chapter details and preferred dates." },
               { title: "Confirm Details", desc: "We'll reach out to confirm workshop details and provide an invoice." },
               { title: "Receive Materials", desc: "Upon payment, we'll send your instructor all necessary workshop materials." },
               { title: "Hold the Workshop", desc: "Your chapter conducts the workshop for its members." },
@@ -110,7 +110,7 @@ export default function Home() {
           <div className="mt-8 flex justify-center">
             <Link href="/chapter-request">
               <Button size="lg" className="bg-primary hover:bg-primary/90">
-                Request the Ethics Workshop <ArrowRight className="ml-2 h-4 w-4" />
+                Request the CFP Ethics Workshop <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </div>

@@ -44,7 +44,7 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent cursor-pointer">
-                Ethics Workshop Management Portal
+                CFP Ethics Workshop
               </h1>
             </Link>
           </div>
