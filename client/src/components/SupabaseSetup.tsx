@@ -51,45 +51,32 @@ CREATE TABLE IF NOT EXISTS public.participants (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
 
--- Enable Row Level Security
-ALTER TABLE public.chapter_requests ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.workshop_sessions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.participants ENABLE ROW LEVEL SECURITY;
+-- IMPORTANT: This disables Row Level Security for simplicity
+-- In a production environment, you would want to configure proper RLS policies
+ALTER TABLE public.chapter_requests DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.workshop_sessions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.participants DISABLE ROW LEVEL SECURITY;
 
--- Create policy to allow all operations for authenticated users
-CREATE POLICY "Enable all operations for authenticated users" 
-  ON public.chapter_requests 
-  FOR ALL 
-  TO authenticated 
-  USING (true) 
-  WITH CHECK (true);
+-- Create service_role access for API operations
+-- This allows the server-side API to perform operations with the service role
+-- Using the SUPABASE_SERVICE_ROLE_KEY environment variable
+GRANT ALL PRIVILEGES ON TABLE public.chapter_requests TO service_role;
+GRANT ALL PRIVILEGES ON TABLE public.workshop_sessions TO service_role;
+GRANT ALL PRIVILEGES ON TABLE public.participants TO service_role;
 
-CREATE POLICY "Enable all operations for authenticated users" 
-  ON public.workshop_sessions 
-  FOR ALL 
-  TO authenticated 
-  USING (true) 
-  WITH CHECK (true);
+-- Enable public access for the application
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.chapter_requests TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.workshop_sessions TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.participants TO anon, authenticated;
 
-CREATE POLICY "Enable all operations for authenticated users" 
-  ON public.participants 
-  FOR ALL 
-  TO authenticated 
-  USING (true) 
-  WITH CHECK (true);
+-- Grant sequence usage
+GRANT USAGE, SELECT ON SEQUENCE chapter_requests_id_seq TO anon, authenticated, service_role;
+GRANT USAGE, SELECT ON SEQUENCE workshop_sessions_id_seq TO anon, authenticated, service_role;
+GRANT USAGE, SELECT ON SEQUENCE participants_id_seq TO anon, authenticated, service_role;
 
--- Enable anon access for read operations
-CREATE POLICY "Enable read access for anonymous users" 
-  ON public.chapter_requests 
-  FOR SELECT 
-  TO anon 
-  USING (true);
-
-CREATE POLICY "Enable read access for anonymous users" 
-  ON public.workshop_sessions 
-  FOR SELECT 
-  TO anon 
-  USING (true);`;
+-- Set up Foreign Key Permissions
+GRANT REFERENCES ON public.chapter_requests TO anon, authenticated, service_role;
+GRANT REFERENCES ON public.workshop_sessions TO anon, authenticated, service_role;`;
 
 export default function SupabaseSetup() {
   const [sqlScript, setSqlScript] = useState<string>(initialSqlScript);
@@ -208,7 +195,14 @@ export default function SupabaseSetup() {
                 <p className="mb-2"><strong>Prerequisites:</strong></p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>Create tables in Supabase using the SQL script</li>
-                  <li>Ensure your SUPABASE_URL and SUPABASE_ANON_KEY environment variables are set</li>
+                  <li>Set the following environment variables:
+                    <ul className="list-disc pl-5 mt-1">
+                      <li>SUPABASE_URL - Your Supabase project URL</li>
+                      <li>SUPABASE_SERVICE_ROLE_KEY - Service role key for admin operations</li>
+                      <li>SUPABASE_ANON_KEY - Anon key for client operations</li>
+                    </ul>
+                  </li>
+                  <li>The service role key (preferred) has more permissions than the anon key</li>
                   <li>You must be logged in as an admin to use this function</li>
                 </ul>
               </div>

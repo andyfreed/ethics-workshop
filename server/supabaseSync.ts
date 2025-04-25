@@ -4,14 +4,27 @@ import { ChapterRequest, insertChapterRequestSchema } from '@shared/schema';
 
 // Initialize Supabase server-side client
 const supabaseUrl = process.env.SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_ANON_KEY || "";
+// Try to use service role key first (with more permissions), fall back to anon key
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "";
+const supabaseKey = supabaseServiceKey || supabaseAnonKey;
 
 if (!supabaseUrl || !supabaseKey) {
   console.warn('Supabase credentials are missing or invalid. Syncing will be disabled.');
 }
 
+// Log which key we're using (without revealing the actual key)
+if (supabaseUrl && supabaseKey) {
+  console.log(`Initializing Supabase client with ${supabaseServiceKey ? 'service role' : 'anon'} key`);
+}
+
 export const supabase = supabaseUrl && supabaseKey
-  ? createClient(supabaseUrl, supabaseKey)
+  ? createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
   : null;
 
 // Sync functions for chapter requests
