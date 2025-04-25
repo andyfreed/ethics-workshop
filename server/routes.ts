@@ -13,6 +13,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import crypto from "crypto";
 import MemoryStore from "memorystore";
+import { syncChapterRequestToSupabase, syncAllDataToSupabase } from "./supabaseSync";
 
 // Helper to handle zod validation errors
 function handleZodError(err: unknown, res: Response) {
@@ -136,6 +137,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const requestData = insertChapterRequestSchema.parse(req.body);
       const newRequest = await storage.createChapterRequest(requestData);
+      
+      // Sync the new chapter request to Supabase
+      try {
+        await syncChapterRequestToSupabase(newRequest);
+      } catch (syncErr) {
+        console.error('Error syncing to Supabase:', syncErr);
+        // Continue with the response even if sync fails
+      }
+      
       res.status(201).json(newRequest);
     } catch (err) {
       handleZodError(err, res);
@@ -278,7 +288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       p.lastName,
       p.cfpId,
       p.email,
-      p.sessionId.toString(),
+      p.sessionId?.toString() || '',
       p.attendanceConfirmed ? 'Yes' : 'No',
       p.reportedToCfpBoard ? 'Yes' : 'No',
       p.createdAt.toISOString()
@@ -292,6 +302,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=participants.csv');
     res.send(csvContent);
+  });
+  
+  // Sync data to Supabase (admin only)
+  app.post('/api/sync/supabase', isAdmin, async (req, res) => {
+    try {
+      await syncAllDataToSupabase();
+      res.json({ success: true, message: "Data successfully synced to Supabase" });
+    } catch (err) {
+      console.error('Error syncing to Supabase:', err);
+      res.status(500).json({ success: false, message: "Failed to sync data to Supabase" });
+    }
   });
 
   return httpServer;
