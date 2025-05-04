@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { syncAllDataToSupabase, supabase } from "./supabaseSync";
+import { checkDatabaseStatus, logDatabaseStatus } from "./statusCheck";
 
 const app = express();
 app.use(express.json());
@@ -57,30 +58,52 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Check Supabase configuration
-  if (supabase) {
-    log("Supabase client initialized successfully");
+  // Check database status
+  try {
+    const dbStatus = await checkDatabaseStatus();
+    logDatabaseStatus(dbStatus);
     
-    // Attempt initial sync of all data to Supabase
-    try {
-      await syncAllDataToSupabase();
-      log("Initial data sync to Supabase completed");
-    } catch (err) {
-      // Enhanced error logging
-      console.error("Failed to perform initial Supabase sync:", err);
-      if (err instanceof Error) {
-        console.error("Error details:", {
-          message: err.message,
-          stack: err.stack,
-          name: err.name
-        });
-      }
-      log("Application will continue using local storage only");
+    if (dbStatus.local.available) {
+      log("Local database connection successful");
+    } else {
+      log("WARNING: Local database connection failed. Application may not function correctly.");
     }
-  } else {
-    console.warn("Supabase client not available. Data will not be synced to Supabase.");
-    console.warn("Set SUPABASE_URL and SUPABASE_ANON_KEY environment variables to enable Supabase integration.");
-    log("Application will continue using local storage only");
+    
+    // Check Supabase configuration
+    if (supabase && dbStatus.supabase.available) {
+      log("Supabase client initialized and connected successfully");
+      
+      // Attempt initial sync of all data to Supabase
+      try {
+        await syncAllDataToSupabase();
+        log("Initial data sync to Supabase completed");
+      } catch (err) {
+        // Enhanced error logging
+        console.error("Failed to perform initial Supabase sync:", err);
+        if (err instanceof Error) {
+          console.error("Error details:", {
+            message: err.message,
+            stack: err.stack,
+            name: err.name
+          });
+        }
+        log("Application will continue using local storage only");
+      }
+    } else {
+      if (supabase) {
+        log("Supabase client initialized but connection failed");
+        if (dbStatus.supabase.error) {
+          log(`Supabase error: ${dbStatus.supabase.error}`);
+        }
+      } else {
+        console.warn("Supabase client not available. Data will not be synced to Supabase.");
+        console.warn("Set SUPABASE_URL and SUPABASE_ANON_KEY environment variables to enable Supabase integration.");
+      }
+      log("Application will continue using local database only");
+    }
+  } catch (error) {
+    console.error("Error checking database status:", error);
+    log("Application will start with unknown database status");
   }
 
   // ALWAYS serve the app on port 5000

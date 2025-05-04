@@ -15,6 +15,7 @@ import crypto from "crypto";
 import MemoryStore from "memorystore";
 import { syncChapterRequestToSupabase, syncAllDataToSupabase } from "./supabaseSync";
 import { sendChapterRequestNotification } from "./email";
+import { checkDatabaseStatus } from "./statusCheck";
 
 // Helper to handle zod validation errors
 function handleZodError(err: unknown, res: Response) {
@@ -337,6 +338,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Database status endpoint (admin-only)
+  app.get('/api/system/db-status', isAdmin, async (req, res) => {
+    try {
+      const status = await checkDatabaseStatus();
+      res.json(status);
+    } catch (err) {
+      console.error('Error checking database status:', err);
+      res.status(500).json({ 
+        message: "Error checking database status",
+        error: err instanceof Error ? err.message : 'Unknown error'
+      });
+    }
+  });
+
   // Serve the SQL setup file
   app.get('/supabase_setup.sql', (req, res) => {
     const fs = require('fs');
