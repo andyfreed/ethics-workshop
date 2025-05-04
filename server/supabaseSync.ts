@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { storage } from './storage';
 import { ChapterRequest, insertChapterRequestSchema } from '@shared/schema';
 
@@ -9,23 +10,49 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "";
 const supabaseKey = supabaseServiceKey || supabaseAnonKey;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn('Supabase credentials are missing or invalid. Syncing will be disabled.');
+// Validate the Supabase URL format - must start with https:// and have a valid domain
+let isValidSupabaseUrl = false;
+if (supabaseUrl) {
+  try {
+    const url = new URL(supabaseUrl);
+    isValidSupabaseUrl = url.protocol === 'https:' && url.hostname.includes('.');
+  } catch (e) {
+    console.warn('Invalid Supabase URL format:', supabaseUrl);
+  }
+}
+
+// Log warnings if credentials are missing or invalid
+if (!supabaseUrl || !isValidSupabaseUrl) {
+  console.warn('Supabase URL is missing or invalid. Syncing will be disabled.');
+}
+
+if (!supabaseKey) {
+  console.warn('Supabase API key is missing. Syncing will be disabled.');
 }
 
 // Log which key we're using (without revealing the actual key)
-if (supabaseUrl && supabaseKey) {
+if (isValidSupabaseUrl && supabaseKey) {
   console.log(`Initializing Supabase client with ${supabaseServiceKey ? 'service role' : 'anon'} key`);
+  console.log(`Connecting to Supabase at: ${supabaseUrl.substring(0, 18)}...`);
 }
 
-export const supabase = supabaseUrl && supabaseKey
-  ? createClient(supabaseUrl, supabaseKey, {
+// Only create the client if we have valid credentials
+let supabase: SupabaseClient | null = null;
+try {
+  if (isValidSupabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
       }
-    })
-  : null;
+    });
+  }
+} catch (error) {
+  console.error('Error creating Supabase client:', error);
+  supabase = null;
+}
+
+export { supabase };
 
 // Sync functions for chapter requests
 export async function syncChapterRequestToSupabase(request: ChapterRequest): Promise<void> {
