@@ -104,12 +104,30 @@ export async function syncAllDataToSupabase() {
     try {
       const { error: connectionError } = await supabase.from('chapter_requests').select('count', { count: 'exact', head: true });
       if (connectionError) {
-        console.error('Supabase connection error:', connectionError);
+        console.error('Supabase connection error:', {
+          message: connectionError.message,
+          details: connectionError.details,
+          hint: connectionError.hint,
+          code: connectionError.code
+        });
+        
+        // If connection error indicates the table doesn't exist, try to create it
+        if (connectionError.code === '42P01' || // PostgreSQL "relation does not exist"
+            connectionError.message.includes('does not exist') ||
+            connectionError.message.includes('not found') ||
+            connectionError.message.includes('undefined')) {
+          console.log('Tables may not exist. We will continue with local storage only.');
+        }
         return;
       }
       console.log('Supabase connection successful');
     } catch (connErr) {
-      console.error('Exception during Supabase connection check:', connErr);
+      console.error('Supabase connection error:', {
+        message: connErr instanceof Error ? connErr.message : 'Unknown error',
+        details: connErr instanceof Error ? connErr.stack : connErr,
+        hint: '',
+        code: ''
+      });
       return;
     }
     

@@ -66,11 +66,21 @@ app.use((req, res, next) => {
       await syncAllDataToSupabase();
       log("Initial data sync to Supabase completed");
     } catch (err) {
+      // Enhanced error logging
       console.error("Failed to perform initial Supabase sync:", err);
+      if (err instanceof Error) {
+        console.error("Error details:", {
+          message: err.message,
+          stack: err.stack,
+          name: err.name
+        });
+      }
+      log("Application will continue using local storage only");
     }
   } else {
     console.warn("Supabase client not available. Data will not be synced to Supabase.");
     console.warn("Set SUPABASE_URL and SUPABASE_ANON_KEY environment variables to enable Supabase integration.");
+    log("Application will continue using local storage only");
   }
 
   // ALWAYS serve the app on port 5000
