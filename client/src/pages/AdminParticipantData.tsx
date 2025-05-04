@@ -29,12 +29,20 @@ export default function AdminParticipantData() {
   const [filterStatus, setFilterStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: sessions } = useQuery({
+  const { data: sessions } = useQuery<any[]>({
     queryKey: ["/api/workshop-sessions"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/workshop-sessions");
+      return response;
+    },
   });
 
-  const { data: participants, isLoading, isError } = useQuery({
+  const { data: participants, isLoading, isError } = useQuery<any[]>({
     queryKey: ["/api/participants"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/participants");
+      return response;
+    },
   });
 
   const markReportedMutation = useMutation({

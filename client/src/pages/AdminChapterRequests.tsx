@@ -29,8 +29,12 @@ export default function AdminChapterRequests() {
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
 
-  const { data: requests, isLoading, isError } = useQuery({
+  const { data: requests, isLoading, isError } = useQuery<any[]>({
     queryKey: ["/api/chapter-requests"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/chapter-requests");
+      return response;
+    },
   });
 
   const updateStatusMutation = useMutation({
