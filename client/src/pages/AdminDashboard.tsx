@@ -97,15 +97,18 @@ export default function AdminDashboard() {
 
   // Effect to check authentication status
   useEffect(() => {
-    // Only show login if auth check is complete AND user is not authenticated
-    // This prevents showing login dialog during initial loading
-    if (!isLoading) {
-      if (!isAuthenticated || user === null) {
-        setLoginOpen(true);
-      } else {
-        // If authenticated, ensure login modal is closed
-        setLoginOpen(false);
-      }
+    // Never show login dialog during loading
+    if (isLoading) {
+      setLoginOpen(false);
+      return;
+    }
+    
+    // Only after loading is complete, check authentication status
+    if (!isAuthenticated || user === null) {
+      setLoginOpen(true);
+    } else {
+      // If authenticated, ensure login modal is closed
+      setLoginOpen(false);
     }
   }, [isAuthenticated, user, isLoading]);
 

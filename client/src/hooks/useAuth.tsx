@@ -37,11 +37,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (data) {
-      const authData = data as { isAuthenticated: boolean; user?: any };
-      setIsAuthenticated(authData.isAuthenticated);
-      setUser(authData.user || null);
+      const authData = data as { isAuthenticated: boolean; user?: any; sessionExpires?: number };
+      
+      if (authData.isAuthenticated && authData.user) {
+        // If authenticated, update auth state and localStorage
+        setIsAuthenticated(true);
+        setUser(authData.user);
+        localStorage.setItem('ethics_workshop_auth', 'true');
+        
+        // Store session expiration if available
+        if (authData.sessionExpires) {
+          localStorage.setItem('ethics_workshop_session_expires', authData.sessionExpires.toString());
+        }
+      } else {
+        // If not authenticated, clear auth state and localStorage
+        setIsAuthenticated(false);
+        setUser(null);
+        
+        // Only clear localStorage if we're sure authentication failed (not during loading)
+        if (!isLoading) {
+          localStorage.removeItem('ethics_workshop_auth');
+          localStorage.removeItem('ethics_workshop_session_expires');
+        }
+      }
     }
-  }, [data]);
+  }, [data, isLoading]);
 
   const logoutMutation = useMutation({
     mutationFn: () => apiRequest('POST', '/api/logout', {}),
