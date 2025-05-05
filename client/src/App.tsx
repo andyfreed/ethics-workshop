@@ -24,9 +24,7 @@ function Router() {
         <Route path="/participant-signin" component={ParticipantSignIn} />
         <Route path="/supabase-setup" component={SupabaseSetup} />
         <Route path="/admin" component={AdminDashboard} />
-        <Route path="/admin/workshop-sessions" component={AdminDashboard} />
-        <Route path="/admin/chapter-requests" component={AdminDashboard} />
-        <Route path="/admin/participant-data" component={AdminDashboard} />
+        <Route path="/admin/:tab" component={AdminDashboard} />
         <Route path="/admin/supabase-setup" component={SupabaseSetup} />
         <Route component={NotFound} />
       </Switch>

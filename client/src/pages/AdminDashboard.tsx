@@ -77,7 +77,21 @@ export default function AdminDashboard() {
   // Effect to set the active tab based on the URL
   useEffect(() => {
     if (params?.tab) {
-      setActiveTab(params.tab);
+      const tab = params.tab;
+      
+      // Map URL paths to tab values
+      if (tab === "workshop-sessions") {
+        setActiveTab("sessions");
+      } else if (tab === "chapter-requests") {
+        setActiveTab("chapter-requests");
+      } else if (tab === "participant-data") {
+        setActiveTab("participants");
+      } else {
+        setActiveTab(tab);
+      }
+    } else {
+      // Default to sessions tab if no tab specified
+      setActiveTab("sessions");
     }
   }, [params]);
 
@@ -90,7 +104,16 @@ export default function AdminDashboard() {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    setLocation(`/admin/${value}`);
+    // Ensure URL matches tab value exactly
+    if (value === "sessions") {
+      setLocation(`/admin/workshop-sessions`);
+    } else if (value === "chapter-requests") {
+      setLocation(`/admin/chapter-requests`);
+    } else if (value === "participants") {
+      setLocation(`/admin/participant-data`);
+    } else {
+      setLocation(`/admin/${value}`);
+    }
   };
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
