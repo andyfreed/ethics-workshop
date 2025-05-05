@@ -166,7 +166,7 @@ export default function AdminDashboard() {
                   Workshop Sessions
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="requests" 
+                  value="chapter-requests" 
                   className="ml-8 py-4 px-1 data-[state=active]:border-primary-500 data-[state=active]:text-primary-500 data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-b-2 data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:text-gray-700 data-[state=inactive]:hover:border-gray-300"
                 >
                   Chapter Requests
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
                 <AdminWorkshopSessions />
               </TabsContent>
               
-              <TabsContent value="requests" className="mt-0 p-0">
+              <TabsContent value="chapter-requests" className="mt-0 p-0">
                 <AdminChapterRequests />
               </TabsContent>
               

@@ -29,8 +29,11 @@ export default function AdminChapterRequests() {
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
 
-  const { data: requests = [], isLoading, isError } = useQuery<any[]>({
+  const { data: requests = [], isLoading, isError, refetch } = useQuery<any[]>({
     queryKey: ["/api/chapter-requests"],
+    retry: 2,
+    // Longer retry delay to allow session to be established
+    retryDelay: 1000,
   });
 
   const updateStatusMutation = useMutation({
