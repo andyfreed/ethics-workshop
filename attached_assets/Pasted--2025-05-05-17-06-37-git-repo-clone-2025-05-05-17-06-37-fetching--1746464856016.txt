@@ -1,0 +1,167 @@
+[2025-05-05 17:06:37] ╭──────────── git repo clone ───────────╼
+[2025-05-05 17:06:37] │  › fetching app source code
+[2025-05-05 17:06:37] │ => Selecting branch "main"
+[2025-05-05 17:06:37] │ => Checking out commit "7ad634db478b4c31cfcb8118ff7dfe602036971b"
+[2025-05-05 17:06:37] │ 
+[2025-05-05 17:06:37] │  ✔ cloned repo to /workspace
+[2025-05-05 17:06:37] ╰────────────────────────────────────────╼
+[2025-05-05 17:06:37] 
+[2025-05-05 17:06:37]  › configuring build-time app environment variables:
+[2025-05-05 17:06:37]      NODE_ENV DATABASE_URL SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY SENDGRID_API_KEY SESSION_SECRET PORT
+[2025-05-05 17:06:37] 
+[2025-05-05 17:06:37]  › configuring custom build command to be run at the end of the build:
+[2025-05-05 17:06:37]    │ chmod +x deploy.sh && ./deploy.sh
+[2025-05-05 17:06:37] 
+[2025-05-05 17:06:37] ╭──────────── buildpack detection ───────────╼
+[2025-05-05 17:06:37] │  › using Ubuntu 22.04 stack
+[2025-05-05 17:06:39] │ Detected the following buildpacks suitable to build your app:
+[2025-05-05 17:06:39] │ 
+[2025-05-05 17:06:39] │    digitalocean/nodejs-appdetect  v0.0.6    
+[2025-05-05 17:06:39] │    heroku/nodejs                  v0.288.4  (Node.js)
+[2025-05-05 17:06:39] │    digitalocean/procfile          v0.0.5    (Procfile)
+[2025-05-05 17:06:39] │    digitalocean/custom            v0.1.3    (Custom Build Command)
+[2025-05-05 17:06:39] ╰─────────────────────────────────────────────╼
+[2025-05-05 17:06:39] 
+[2025-05-05 17:06:39] ╭──────────── app build ───────────╼
+[2025-05-05 17:06:39] │ Warning: no analyzed metadata found at path '/layers/analyzed.toml'
+[2025-05-05 17:06:39] │ Timer: Builder started at 2025-05-05T17:06:39Z
+[2025-05-05 17:06:39] │        
+[2025-05-05 17:06:39] │ -----> Creating runtime environment
+[2025-05-05 17:06:39] │        
+[2025-05-05 17:06:39] │        NPM_CONFIG_LOGLEVEL=error
+[2025-05-05 17:06:39] │        NODE_VERBOSE=false
+[2025-05-05 17:06:39] │        NODE_ENV=production
+[2025-05-05 17:06:39] │        NODE_MODULES_CACHE=true
+[2025-05-05 17:06:39] │        
+[2025-05-05 17:06:39] │ -----> Installing binaries
+[2025-05-05 17:06:39] │        engines.node (package.json):   unspecified
+[2025-05-05 17:06:39] │        engines.npm (package.json):    unspecified (use default)
+[2025-05-05 17:06:39] │        
+[2025-05-05 17:06:39] │        Resolving node version 22.x...
+[2025-05-05 17:06:39] │        Downloading and installing node 22.14.0...
+[2025-05-05 17:06:42] │        Using default npm version: 10.9.2
+[2025-05-05 17:06:43] │        
+[2025-05-05 17:06:43] │ -----> Installing dependencies
+[2025-05-05 17:06:43] │        Installing node modules
+[2025-05-05 17:06:54] │        
+[2025-05-05 17:06:54] │        added 509 packages, and audited 510 packages in 11s
+[2025-05-05 17:06:54] │        
+[2025-05-05 17:06:54] │        65 packages are looking for funding
+[2025-05-05 17:06:54] │          run `npm fund` for details
+[2025-05-05 17:06:54] │        
+[2025-05-05 17:06:54] │        7 moderate severity vulnerabilities
+[2025-05-05 17:06:54] │        
+[2025-05-05 17:06:54] │        To address issues that do not require attention, run:
+[2025-05-05 17:06:54] │          npm audit fix
+[2025-05-05 17:06:54] │        
+[2025-05-05 17:06:54] │        To address all issues (including breaking changes), run:
+[2025-05-05 17:06:54] │          npm audit fix --force
+[2025-05-05 17:06:54] │        
+[2025-05-05 17:06:54] │        Run `npm audit` for details.
+[2025-05-05 17:06:54] │        npm notice
+[2025-05-05 17:06:54] │        npm notice New major version of npm available! 10.9.2 -> 11.3.0
+[2025-05-05 17:06:54] │        npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+[2025-05-05 17:06:54] │        npm notice To update run: npm install -g npm@11.3.0
+[2025-05-05 17:06:54] │        npm notice
+[2025-05-05 17:06:54] │        
+[2025-05-05 17:06:54] │ -----> Build
+[2025-05-05 17:06:54] │        
+[2025-05-05 17:06:54] │ -----> Caching build
+[2025-05-05 17:06:54] │        - npm cache
+[2025-05-05 17:06:54] │        
+[2025-05-05 17:06:54] │ -----> Pruning devDependencies
+[2025-05-05 17:06:56] │        
+[2025-05-05 17:06:56] │        up to date, audited 424 packages in 1s
+[2025-05-05 17:06:56] │        
+[2025-05-05 17:06:56] │        57 packages are looking for funding
+[2025-05-05 17:06:56] │          run `npm fund` for details
+[2025-05-05 17:06:56] │        
+[2025-05-05 17:06:56] │        2 moderate severity vulnerabilities
+[2025-05-05 17:06:56] │        
+[2025-05-05 17:06:56] │        To address all issues, run:
+[2025-05-05 17:06:56] │          npm audit fix
+[2025-05-05 17:06:56] │        
+[2025-05-05 17:06:56] │        Run `npm audit` for details.
+[2025-05-05 17:06:56] │        npm notice
+[2025-05-05 17:06:56] │        npm notice New major version of npm available! 10.9.2 -> 11.3.0
+[2025-05-05 17:06:56] │        npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+[2025-05-05 17:06:56] │        npm notice To update run: npm install -g npm@11.3.0
+[2025-05-05 17:06:56] │        npm notice
+[2025-05-05 17:06:56] │        
+[2025-05-05 17:06:56] │ -----> Build succeeded!
+[2025-05-05 17:06:57] │ Running custom build command: chmod +x deploy.sh && ./deploy.sh
+[2025-05-05 17:06:57] │ Preparing for deployment...
+[2025-05-05 17:06:57] │ Installing dependencies...
+[2025-05-05 17:06:57] │ npm warn config production Use `--omit=dev` instead.
+[2025-05-05 17:06:58] │ npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[2025-05-05 17:06:58] │ npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[2025-05-05 17:07:00] │ 
+[2025-05-05 17:07:00] │ added 86 packages, and audited 510 packages in 3s
+[2025-05-05 17:07:00] │ 
+[2025-05-05 17:07:00] │ 65 packages are looking for funding
+[2025-05-05 17:07:00] │   run `npm fund` for details
+[2025-05-05 17:07:00] │ 
+[2025-05-05 17:07:00] │ 7 moderate severity vulnerabilities
+[2025-05-05 17:07:00] │ 
+[2025-05-05 17:07:00] │ To address issues that do not require attention, run:
+[2025-05-05 17:07:00] │   npm audit fix
+[2025-05-05 17:07:00] │ 
+[2025-05-05 17:07:00] │ To address all issues (including breaking changes), run:
+[2025-05-05 17:07:00] │   npm audit fix --force
+[2025-05-05 17:07:00] │ 
+[2025-05-05 17:07:00] │ Run `npm audit` for details.
+[2025-05-05 17:07:00] │ npm notice
+[2025-05-05 17:07:00] │ npm notice New major version of npm available! 10.9.2 -> 11.3.0
+[2025-05-05 17:07:00] │ npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+[2025-05-05 17:07:00] │ npm notice To update run: npm install -g npm@11.3.0
+[2025-05-05 17:07:00] │ npm notice
+[2025-05-05 17:07:00] │ Creating build directories...
+[2025-05-05 17:07:00] │ Building frontend...
+[2025-05-05 17:07:00] │ 
+[2025-05-05 17:07:00] │ > rest-express@1.0.0 build
+[2025-05-05 17:07:00] │ > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+[2025-05-05 17:07:00] │ 
+[2025-05-05 17:07:00] │ vite v5.4.14 building for production...
+[2025-05-05 17:07:00] │ transforming...
+[2025-05-05 17:07:00] │ Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+[2025-05-05 17:07:00] │   npx update-browserslist-db@latest
+[2025-05-05 17:07:00] │   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[2025-05-05 17:07:04] │ ✓ 1740 modules transformed.
+[2025-05-05 17:07:04] │ rendering chunks...
+[2025-05-05 17:07:04] │ computing gzip size...
+[2025-05-05 17:07:04] │ ../dist/public/index.html                   0.63 kB │ gzip:   0.38 kB
+[2025-05-05 17:07:04] │ ../dist/public/assets/index-CbaiORNL.css   84.14 kB │ gzip:  14.39 kB
+[2025-05-05 17:07:04] │ ../dist/public/assets/index-IjRnSkEv.js   497.10 kB │ gzip: 149.63 kB
+[2025-05-05 17:07:04] │ ✓ built in 4.13s
+[2025-05-05 17:07:04] │ 
+[2025-05-05 17:07:04] │   dist/index.js  36.9kb
+[2025-05-05 17:07:04] │ 
+[2025-05-05 17:07:04] │ ⚡ Done in 5ms
+[2025-05-05 17:07:04] │ Starting server...
+[2025-05-05 17:07:07] │ Database pool configured for production environment with max 20 connections
+[2025-05-05 17:07:07] │ Initializing Supabase client with service role key
+[2025-05-05 17:07:07] │ Connecting to Supabase at: https://aaiqocntel...
+[2025-05-05 17:07:09] │ file:///workspace/node_modules/@neondatabase/serverless/index.mjs:1384
+[2025-05-05 17:07:09] │  connect",o),this._clients=this._clients.filter(u=>u!==t),s&&(o.message="Connect\
+[2025-05-05 17:07:09] │                                                                        ^
+[2025-05-05 17:07:09] │ 
+[2025-05-05 17:07:09] │ TypeError: Cannot set property message of #<ErrorEvent> which has only a getter
+[2025-05-05 17:07:09] │     at An._connectionCallback (file:///workspace/node_modules/@neondatabase/serverless/index.mjs:1384:72)
+[2025-05-05 17:07:09] │     at An._handleErrorWhileConnecting (file:///workspace/node_modules/@neondatabase/serverless/index.mjs:1290:38)
+[2025-05-05 17:07:09] │     at An._handleErrorEvent (file:///workspace/node_modules/@neondatabase/serverless/index.mjs:1291:33)
+[2025-05-05 17:07:09] │     at fn.emit (file:///workspace/node_modules/@neondatabase/serverless/index.mjs:397:12)
+[2025-05-05 17:07:09] │     at v.reportStreamError (file:///workspace/node_modules/@neondatabase/serverless/index.mjs:1201:46)
+[2025-05-05 17:07:09] │     at v.emit (file:///workspace/node_modules/@neondatabase/serverless/index.mjs:397:12)
+[2025-05-05 17:07:09] │     at WebSocket.<anonymous> (file:///workspace/node_modules/@neondatabase/serverless/index.mjs:986:42)
+[2025-05-05 17:07:09] │     at callListener (/workspace/node_modules/ws/lib/event-target.js:290:14)
+[2025-05-05 17:07:09] │     at WebSocket.onError (/workspace/node_modules/ws/lib/event-target.js:230:9)
+[2025-05-05 17:07:09] │     at WebSocket.emit (node:events:518:28)
+[2025-05-05 17:07:09] │ 
+[2025-05-05 17:07:09] │ Node.js v22.14.0
+[2025-05-05 17:07:09] │ building: exit status 1
+[2025-05-05 17:07:09] │ Timer: Builder ran for 30.316921704s and ended at 2025-05-05T17:07:09Z
+[2025-05-05 17:07:09] │ ERROR: failed to build: exit status 1
+[2025-05-05 17:07:09] │ 
+[2025-05-05 17:07:09] │ 
+[2025-05-05 17:07:09] │  ✘ build failed
+[]
