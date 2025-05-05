@@ -156,7 +156,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get('/api/user', (req, res) => {
     if (req.isAuthenticated()) {
-      res.json({ isAuthenticated: true, user: req.user });
+      // Get session expiration time (if available) for better client handling
+      const sessionExpiryTime = req.session.cookie.expires ? 
+        new Date(req.session.cookie.expires).getTime() : 
+        Date.now() + (24 * 60 * 60 * 1000); // Default 24 hours
+      
+      res.json({ 
+        isAuthenticated: true, 
+        user: req.user, 
+        sessionExpires: sessionExpiryTime,
+        sessionID: req.sessionID // Include for debugging
+      });
     } else {
       res.json({ isAuthenticated: false });
     }

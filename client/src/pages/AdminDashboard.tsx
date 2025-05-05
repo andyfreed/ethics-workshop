@@ -97,12 +97,15 @@ export default function AdminDashboard() {
 
   // Effect to check authentication status
   useEffect(() => {
-    // Only show login if user is definitely not authenticated (not during loading)
-    if (user === null && !isLoading) {
-      setLoginOpen(true);
-    } else if (isAuthenticated && user) {
-      // Close login modal if user is authenticated
-      setLoginOpen(false);
+    // Only show login if auth check is complete AND user is not authenticated
+    // This prevents showing login dialog during initial loading
+    if (!isLoading) {
+      if (!isAuthenticated || user === null) {
+        setLoginOpen(true);
+      } else {
+        // If authenticated, ensure login modal is closed
+        setLoginOpen(false);
+      }
     }
   }, [isAuthenticated, user, isLoading]);
 
@@ -130,9 +133,32 @@ export default function AdminDashboard() {
     return null;
   }
 
+  // If still loading authentication, show a loading indicator instead of login
+  if (isLoading) {
+    return (
+      <Card className="min-h-[500px] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+          <p className="mt-4 text-sm text-muted-foreground">Checking authentication status...</p>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <>
-      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+      <Dialog 
+        open={loginOpen} 
+        onOpenChange={(open) => {
+          // Only allow closing if authenticated
+          if (!open && !isAuthenticated) {
+            return;
+          }
+          setLoginOpen(open);
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Admin Login</DialogTitle>

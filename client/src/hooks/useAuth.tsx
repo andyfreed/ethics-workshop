@@ -22,14 +22,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<any | null>(null);
 
-  // Check authentication status on initial load
+  // Check authentication status on initial load with more resilience
   const { data, refetch, isLoading } = useQuery({
     queryKey: ['/api/user'],
-    // Will be authenticated if the user is logged in
-    retry: 1,
-    refetchOnWindowFocus: true,
+    // Improved configuration for authentication persistence
+    retry: 2,
+    retryDelay: 1000,
+    refetchOnWindowFocus: false, // Avoid interrupting user experience
     refetchOnMount: true,
-    refetchInterval: 300000, // Refresh every 5 minutes
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    refetchInterval: 10 * 60 * 1000, // Refresh session every 10 minutes
+    refetchIntervalInBackground: true // Keep refreshing even when tab is not active
   });
 
   useEffect(() => {
@@ -48,11 +51,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     },
   });
 
+  // Check for stored auth on component mount
+  useEffect(() => {
+    const checkStoredAuth = async () => {
+      // If we have a stored auth flag but aren't authenticated yet, trigger a refetch
+      const hasStoredAuth = localStorage.getItem('ethics_workshop_auth') === 'true';
+      if (hasStoredAuth && !isAuthenticated && !isLoading) {
+        await refetch();
+      }
+    };
+    
+    checkStoredAuth();
+  }, [isAuthenticated, isLoading, refetch]);
+
   const login = () => {
+    // Set a flag in localStorage for better persistence
+    localStorage.setItem('ethics_workshop_auth', 'true');
     refetch();
   };
 
   const logout = async () => {
+    // Remove the auth flag on logout
+    localStorage.removeItem('ethics_workshop_auth');
     await logoutMutation.mutateAsync();
   };
 
