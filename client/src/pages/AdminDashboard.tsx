@@ -14,7 +14,7 @@ import { z } from "zod";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { 
   Dialog,
   DialogContent,
@@ -46,8 +46,13 @@ export default function AdminDashboard() {
   });
 
   const loginMutation = useMutation({
-    mutationFn: (credentials: z.infer<typeof loginSchema>) => 
-      apiRequest("POST", "/api/login", credentials),
+    mutationFn: async (credentials: z.infer<typeof loginSchema>) => {
+      // First do the login request
+      const response = await apiRequest("POST", "/api/login", credentials);
+      // Then immediately verify the login by getting the user info
+      await apiRequest("GET", "/api/user", null);
+      return response;
+    },
     onSuccess: () => {
       login();
       setLoginOpen(false);
@@ -55,6 +60,10 @@ export default function AdminDashboard() {
         title: "Logged in",
         description: "You have been successfully logged in.",
       });
+      // Fetch data for all admin components after login
+      queryClient.invalidateQueries({ queryKey: ["/api/workshop-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/chapter-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/participants"] });
     },
     onError: (error) => {
       toast({

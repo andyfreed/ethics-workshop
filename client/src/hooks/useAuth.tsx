@@ -21,15 +21,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
 
   // Check authentication status on initial load
-  const { data, refetch } = useQuery({
+  const { data, refetch, isLoading } = useQuery({
     queryKey: ['/api/user'],
     // Will be authenticated if the user is logged in
+    retry: 1,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchInterval: 300000, // Refresh every 5 minutes
   });
 
   useEffect(() => {
     if (data) {
-      setIsAuthenticated(data.isAuthenticated);
-      setUser(data.user || null);
+      const authData = data as { isAuthenticated: boolean; user?: any };
+      setIsAuthenticated(authData.isAuthenticated);
+      setUser(authData.user || null);
     }
   }, [data]);
 

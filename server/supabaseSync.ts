@@ -119,8 +119,8 @@ export async function syncChapterRequestToSupabase(request: ChapterRequest): Pro
 
 // Utility function to sync all data to Supabase
 export async function syncAllDataToSupabase() {
-  if (!supabase) {
-    console.warn('Supabase client not available. Skipping sync.');
+  if (!supabase || !process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn('Supabase client or environment variables not available. Skipping sync.');
     return;
   }
 
