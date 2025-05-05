@@ -30,7 +30,7 @@ function handleZodError(err: unknown, res: Response) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check endpoint for container orchestration
+  // Health check endpoint for production deployments
   app.get('/health', (req, res) => {
     res.status(200).send('OK');
   });
