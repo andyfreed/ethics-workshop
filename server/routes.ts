@@ -30,6 +30,10 @@ function handleZodError(err: unknown, res: Response) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint for container orchestration
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
   const httpServer = createServer(app);
   
   // Set up session middleware

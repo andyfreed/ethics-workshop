@@ -2,30 +2,31 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Install dependencies for better caching
 COPY package*.json ./
-
-# Install dependencies without pruning dev dependencies
 RUN npm install --production=false
 
-# Copy source code
+# Copy source files
 COPY . .
 
-# Create client directory for static assets
+# Create static asset directory
 RUN mkdir -p dist/client
 
-# Install tsx globally for TypeScript execution
-RUN npm install -g tsx
+# Build the client
+RUN npm run build
 
-# Initialize database schema
-RUN npx drizzle-kit push
+# Compile TypeScript to JavaScript with production configuration
+RUN npx tsc -p tsconfig.prod.json
 
-# Expose port
+# Expose port 8080 for Digital Ocean
 EXPOSE 8080
 
-# Set environment variables
+# Set production environment variables
 ENV NODE_ENV=production
 ENV PORT=8080
 
-# Start command - run TypeScript directly with tsx
-CMD ["npx", "tsx", "server/index.ts"]
+# Health check to verify the application is running
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD wget -qO- http://localhost:8080/health || exit 1
+
+# Start the application - try JavaScript first, fallback to TypeScript
+CMD ["sh", "-c", "if [ -f dist/server/index.js ]; then node dist/server/index.js; else npx tsx server/index.ts; fi"]

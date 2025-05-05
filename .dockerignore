@@ -1,9 +1,25 @@
+# Node modules
 node_modules
 npm-debug.log
+
+# Build directories
+dist
+build
+
+# Git
 .git
 .gitignore
-.env
+
+# Docker
+.dockerignore
+Dockerfile
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS generated files
 .DS_Store
-dist
-build.sh
-README.md
+Thumbs.db
