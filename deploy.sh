@@ -93,13 +93,17 @@ import session from 'express-session';
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { dirname } from 'path';
 import { Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from 'ws';
 import * as schema from './shared/schema.js';
 import { scrypt, timingSafeEqual, randomBytes } from 'crypto';
 import { promisify } from 'util';
-import { log } from './server/vite.js';
+
+// ES Modules compatibility - equivalent to __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Configure database connection
 const neonConfig = { webSocketConstructor: ws };
