@@ -11,9 +11,11 @@ RUN npm install --production=false
 # Copy source code
 COPY . .
 
-# Skip frontend build and just copy static assets
-# This avoids issues with Vite build
+# Create client directory for static assets
 RUN mkdir -p dist/client
+
+# Install tsx globally for TypeScript execution
+RUN npm install -g tsx
 
 # Initialize database schema
 RUN npx drizzle-kit push
@@ -25,5 +27,5 @@ EXPOSE 8080
 ENV NODE_ENV=production
 ENV PORT=8080
 
-# Start command - run directly from source
-CMD ["node", "server/index.js"]
+# Start command - run TypeScript directly with tsx
+CMD ["npx", "tsx", "server/index.ts"]
