@@ -5,6 +5,7 @@ import { apiRequest } from '@/lib/queryClient';
 interface AuthContextType {
   isAuthenticated: boolean;
   user: any | null;
+  isLoading: boolean;
   login: () => void;
   logout: () => Promise<void>;
 }
@@ -12,6 +13,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   user: null,
+  isLoading: false,
   login: () => {},
   logout: async () => {},
 });
@@ -55,7 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

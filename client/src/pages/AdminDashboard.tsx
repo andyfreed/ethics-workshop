@@ -30,7 +30,7 @@ const loginSchema = z.object({
 });
 
 export default function AdminDashboard() {
-  const { isAuthenticated, user, login } = useAuth();
+  const { isAuthenticated, user, isLoading, login } = useAuth();
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/admin/:tab?");
   const { toast } = useToast();
@@ -97,10 +97,14 @@ export default function AdminDashboard() {
 
   // Effect to check authentication status
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Only show login if user is definitely not authenticated (not during loading)
+    if (user === null && !isLoading) {
       setLoginOpen(true);
+    } else if (isAuthenticated && user) {
+      // Close login modal if user is authenticated
+      setLoginOpen(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user, isLoading]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
