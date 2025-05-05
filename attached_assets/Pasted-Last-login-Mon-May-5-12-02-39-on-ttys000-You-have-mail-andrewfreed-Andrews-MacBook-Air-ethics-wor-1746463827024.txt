@@ -1,0 +1,77 @@
+Last login: Mon May  5 12:02:39 on ttys000
+You have mail.
+andrewfreed@Andrews-MacBook-Air ethics-workshop % docker build -t ethics-workshop:latest .
+
+[+] Building 24.8s (13/13) FINISHED                        docker:desktop-linux
+ => [internal] load build definition from Dockerfile                       0.0s
+ => => transferring dockerfile: 939B                                       0.0s
+ => [internal] load metadata for docker.io/library/node:20-alpine          3.4s
+ => [auth] library/node:pull token for registry-1.docker.io                0.0s
+ => [internal] load .dockerignore                                          0.0s
+ => => transferring context: 2B                                            0.0s
+ => [1/8] FROM docker.io/library/node:20-alpine@sha256:c628bdc7ebc7f95b1b  3.5s
+ => => resolve docker.io/library/node:20-alpine@sha256:c628bdc7ebc7f95b1b  0.0s
+ => => sha256:a8c23aebbdc3af49dc775b14ff5448d1c781f6914c6b0fe 444B / 444B  0.1s
+ => => sha256:fe37ac954e5e4e10ba5e1d2ab0ee1e17e094c8a2674 1.26MB / 1.26MB  0.2s
+ => => sha256:ea00b69f938d915f75eb18ab43debcf665e0cf852 42.63MB / 42.63MB  2.3s
+ => => extracting sha256:ea00b69f938d915f75eb18ab43debcf665e0cf852e9e1c16  1.0s
+ => => extracting sha256:fe37ac954e5e4e10ba5e1d2ab0ee1e17e094c8a2674f93bd  0.0s
+ => => extracting sha256:a8c23aebbdc3af49dc775b14ff5448d1c781f6914c6b0fe3  0.0s
+ => [internal] load build context                                          0.2s
+ => => transferring context: 4.87MB                                        0.2s
+ => [2/8] WORKDIR /app                                                     0.2s
+ => [3/8] COPY package*.json ./                                            0.0s
+ => [4/8] RUN npm install --production=false                               7.6s
+ => [5/8] COPY . .                                                         0.2s 
+ => [6/8] RUN mkdir -p dist/client                                         0.1s 
+ => [7/8] RUN npm run build                                                3.3s 
+ => ERROR [8/8] RUN npx tsc -p tsconfig.prod.json                          6.3s
+------
+ > [8/8] RUN npx tsc -p tsconfig.prod.json:
+6.215 client/src/lib/supabase.ts(5,21): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+6.215 client/src/lib/supabase.ts(6,21): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+6.215 client/src/pages/AdminWorkshopSessions.tsx(189,18): error TS2339: Property 'length' does not exist on type '{}'.
+6.215 client/src/pages/AdminWorkshopSessions.tsx(205,22): error TS18046: 'sessions' is of type 'unknown'.
+6.215 client/src/pages/ParticipantSignIn.tsx(128,52): error TS2339: Property 'length' does not exist on type '{}'.
+6.215 client/src/pages/ParticipantSignIn.tsx(129,38): error TS2339: Property 'map' does not exist on type '{}'.
+6.215 server/routes.ts(103,37): error TS7006: Parameter 'err' implicitly has an 'any' type.
+6.215 server/routes.ts(103,42): error TS7006: Parameter 'user' implicitly has an 'any' type.
+6.215 server/routes.ts(103,48): error TS7006: Parameter 'info' implicitly has an 'any' type.
+6.215 server/routes.ts(347,62): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+6.215   Type 'null' is not assignable to type 'number'.
+6.215 server/storage.ts(150,71): error TS2322: Type 'SQL<unknown> | undefined' is not assignable to type 'SQL<unknown>'.
+6.215   Type 'undefined' is not assignable to type 'SQL<unknown>'.
+6.215 server/vite.ts(39,5): error TS2322: Type '{ middlewareMode: boolean; hmr: { server: Server<typeof IncomingMessage, typeof ServerResponse>; }; allowedHosts: boolean; }' is not assignable to type 'ServerOptions'.
+6.215   Types of property 'allowedHosts' are incompatible.
+6.215     Type 'boolean' is not assignable to type 'true | string[] | undefined'.
+6.215 server/vite.ts(49,9): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+6.215 server/vite.ts(71,33): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+6.215 vite.config.ts(21,25): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+6.215 vite.config.ts(22,31): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+6.215 vite.config.ts(23,31): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+6.215 vite.config.ts(26,22): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+6.215 vite.config.ts(28,26): error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+------
+Dockerfile:19
+--------------------
+  17 |     
+  18 |     # Compile TypeScript to JavaScript with production configuration
+  19 | >>> RUN npx tsc -p tsconfig.prod.json
+  20 |     
+  21 |     # Expose port 8080 for Digital Ocean
+--------------------
+ERROR: failed to solve: process "/bin/sh -c npx tsc -p tsconfig.prod.json" did not complete successfully: exit code: 2
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/ms9s662q09mbrx5n4204ipu2n
+andrewfreed@Andrews-MacBook-Air ethics-workshop % docker run -p 8080:8080 \
+  -e DATABASE_URL=your_database_url \
+  -e SUPABASE_URL=your_supabase_url \
+  -e SUPABASE_SERVICE_ROLE_KEY=your_key \
+  -e SENDGRID_API_KEY=your_key \
+  -e SESSION_SECRET=your_secret \
+  ethics-workshop:latest
+Unable to find image 'ethics-workshop:latest' locally
+docker: Error response from daemon: pull access denied for ethics-workshop, repository does not exist or may require 'docker login'
+
+Run 'docker run --help' for more information
+andrewfreed@Andrews-MacBook-Air ethics-workshop % 

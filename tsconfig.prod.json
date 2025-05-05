@@ -3,8 +3,10 @@
   "compilerOptions": {
     "noEmit": false,
     "outDir": "dist",
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "Node",
-    "allowImportingTsExtensions": false
+    "allowImportingTsExtensions": false,
+    "skipLibCheck": true,
+    "isolatedModules": true
   }
 }
