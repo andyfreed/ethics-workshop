@@ -11,6 +11,10 @@ echo "Preparing for deployment..."
 echo "Installing dependencies and build tools..."
 npm install --production=false
 
+# Make sure we have all required dev dependencies for build
+echo "Ensuring all build tools are available..."
+npm install --no-save @vitejs/plugin-react vite esbuild tailwindcss postcss autoprefixer tsx
+
 # Force install a specific version of Neon Database driver that works
 echo "Installing compatible database driver..."
 npm install --no-save @neondatabase/serverless@0.7.2
