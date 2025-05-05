@@ -1,0 +1,189 @@
+[2025-05-05 17:08:52] ╭──────────── git repo clone ───────────╼
+[2025-05-05 17:08:52] │  › fetching app source code
+[2025-05-05 17:08:52] │ => Selecting branch "main"
+[2025-05-05 17:08:52] │ => Checking out commit "868ebd714405e06d0198fc2b23e02ef3122be870"
+[2025-05-05 17:08:52] │ 
+[2025-05-05 17:08:52] │  ✔ cloned repo to /workspace
+[2025-05-05 17:08:52] ╰────────────────────────────────────────╼
+[2025-05-05 17:08:52] 
+[2025-05-05 17:08:53]  › configuring build-time app environment variables:
+[2025-05-05 17:08:53]      NODE_ENV DATABASE_URL SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY SENDGRID_API_KEY SESSION_SECRET PORT
+[2025-05-05 17:08:53] 
+[2025-05-05 17:08:53]  › configuring custom build command to be run at the end of the build:
+[2025-05-05 17:08:53]    │ chmod +x deploy.sh && ./deploy.sh
+[2025-05-05 17:08:53] 
+[2025-05-05 17:08:53] ╭──────────── buildpack detection ───────────╼
+[2025-05-05 17:08:53] │  › using Ubuntu 22.04 stack
+[2025-05-05 17:08:54] │ Detected the following buildpacks suitable to build your app:
+[2025-05-05 17:08:54] │ 
+[2025-05-05 17:08:54] │    digitalocean/nodejs-appdetect  v0.0.6    
+[2025-05-05 17:08:54] │    heroku/nodejs                  v0.288.4  (Node.js)
+[2025-05-05 17:08:54] │    digitalocean/procfile          v0.0.5    (Procfile)
+[2025-05-05 17:08:54] │    digitalocean/custom            v0.1.3    (Custom Build Command)
+[2025-05-05 17:08:54] ╰─────────────────────────────────────────────╼
+[2025-05-05 17:08:54] 
+[2025-05-05 17:08:54] ╭──────────── app build ───────────╼
+[2025-05-05 17:08:54] │ Warning: no analyzed metadata found at path '/layers/analyzed.toml'
+[2025-05-05 17:08:54] │ Timer: Builder started at 2025-05-05T17:08:54Z
+[2025-05-05 17:08:55] │        
+[2025-05-05 17:08:55] │ -----> Creating runtime environment
+[2025-05-05 17:08:55] │        
+[2025-05-05 17:08:55] │        NPM_CONFIG_LOGLEVEL=error
+[2025-05-05 17:08:55] │        NODE_VERBOSE=false
+[2025-05-05 17:08:55] │        NODE_ENV=production
+[2025-05-05 17:08:55] │        NODE_MODULES_CACHE=true
+[2025-05-05 17:08:55] │        
+[2025-05-05 17:08:55] │ -----> Installing binaries
+[2025-05-05 17:08:55] │        engines.node (package.json):   unspecified
+[2025-05-05 17:08:55] │        engines.npm (package.json):    unspecified (use default)
+[2025-05-05 17:08:55] │        
+[2025-05-05 17:08:55] │        Resolving node version 22.x...
+[2025-05-05 17:08:55] │        Downloading and installing node 22.14.0...
+[2025-05-05 17:08:58] │        Using default npm version: 10.9.2
+[2025-05-05 17:08:59] │        
+[2025-05-05 17:08:59] │ -----> Installing dependencies
+[2025-05-05 17:08:59] │        Installing node modules
+[2025-05-05 17:09:12] │        
+[2025-05-05 17:09:12] │        added 509 packages, and audited 510 packages in 12s
+[2025-05-05 17:09:12] │        
+[2025-05-05 17:09:12] │        65 packages are looking for funding
+[2025-05-05 17:09:12] │          run `npm fund` for details
+[2025-05-05 17:09:12] │        
+[2025-05-05 17:09:12] │        7 moderate severity vulnerabilities
+[2025-05-05 17:09:12] │        
+[2025-05-05 17:09:12] │        To address issues that do not require attention, run:
+[2025-05-05 17:09:12] │          npm audit fix
+[2025-05-05 17:09:12] │        
+[2025-05-05 17:09:12] │        To address all issues (including breaking changes), run:
+[2025-05-05 17:09:12] │          npm audit fix --force
+[2025-05-05 17:09:12] │        
+[2025-05-05 17:09:12] │        Run `npm audit` for details.
+[2025-05-05 17:09:12] │        npm notice
+[2025-05-05 17:09:12] │        npm notice New major version of npm available! 10.9.2 -> 11.3.0
+[2025-05-05 17:09:12] │        npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+[2025-05-05 17:09:12] │        npm notice To update run: npm install -g npm@11.3.0
+[2025-05-05 17:09:12] │        npm notice
+[2025-05-05 17:09:12] │        
+[2025-05-05 17:09:12] │ -----> Build
+[2025-05-05 17:09:12] │        
+[2025-05-05 17:09:12] │ -----> Caching build
+[2025-05-05 17:09:12] │        - npm cache
+[2025-05-05 17:09:12] │        
+[2025-05-05 17:09:12] │ -----> Pruning devDependencies
+[2025-05-05 17:09:13] │        
+[2025-05-05 17:09:13] │        up to date, audited 424 packages in 1s
+[2025-05-05 17:09:13] │        
+[2025-05-05 17:09:13] │        57 packages are looking for funding
+[2025-05-05 17:09:13] │          run `npm fund` for details
+[2025-05-05 17:09:13] │        
+[2025-05-05 17:09:13] │        2 moderate severity vulnerabilities
+[2025-05-05 17:09:13] │        
+[2025-05-05 17:09:13] │        To address all issues, run:
+[2025-05-05 17:09:13] │          npm audit fix
+[2025-05-05 17:09:13] │        
+[2025-05-05 17:09:13] │        Run `npm audit` for details.
+[2025-05-05 17:09:13] │        npm notice
+[2025-05-05 17:09:13] │        npm notice New major version of npm available! 10.9.2 -> 11.3.0
+[2025-05-05 17:09:13] │        npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+[2025-05-05 17:09:13] │        npm notice To update run: npm install -g npm@11.3.0
+[2025-05-05 17:09:13] │        npm notice
+[2025-05-05 17:09:14] │        
+[2025-05-05 17:09:14] │ -----> Build succeeded!
+[2025-05-05 17:09:14] │ Running custom build command: chmod +x deploy.sh && ./deploy.sh
+[2025-05-05 17:09:14] │ Preparing for deployment...
+[2025-05-05 17:09:14] │ Installing dependencies...
+[2025-05-05 17:09:14] │ npm warn config production Use `--omit=dev` instead.
+[2025-05-05 17:09:15] │ npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[2025-05-05 17:09:15] │ npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[2025-05-05 17:09:17] │ 
+[2025-05-05 17:09:17] │ added 86 packages, and audited 510 packages in 3s
+[2025-05-05 17:09:17] │ 
+[2025-05-05 17:09:17] │ 65 packages are looking for funding
+[2025-05-05 17:09:17] │   run `npm fund` for details
+[2025-05-05 17:09:17] │ 
+[2025-05-05 17:09:17] │ 7 moderate severity vulnerabilities
+[2025-05-05 17:09:17] │ 
+[2025-05-05 17:09:17] │ To address issues that do not require attention, run:
+[2025-05-05 17:09:17] │   npm audit fix
+[2025-05-05 17:09:17] │ 
+[2025-05-05 17:09:17] │ To address all issues (including breaking changes), run:
+[2025-05-05 17:09:17] │   npm audit fix --force
+[2025-05-05 17:09:17] │ 
+[2025-05-05 17:09:17] │ Run `npm audit` for details.
+[2025-05-05 17:09:17] │ npm notice
+[2025-05-05 17:09:17] │ npm notice New major version of npm available! 10.9.2 -> 11.3.0
+[2025-05-05 17:09:17] │ npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+[2025-05-05 17:09:17] │ npm notice To update run: npm install -g npm@11.3.0
+[2025-05-05 17:09:17] │ npm notice
+[2025-05-05 17:09:17] │ Installing compatible database driver...
+[2025-05-05 17:09:18] │ npm warn ERESOLVE overriding peer dependency
+[2025-05-05 17:09:18] │ npm warn While resolving: rest-express@1.0.0
+[2025-05-05 17:09:18] │ npm warn Found: @neondatabase/serverless@0.10.4
+[2025-05-05 17:09:18] │ npm warn node_modules/@neondatabase/serverless
+[2025-05-05 17:09:18] │ npm warn   peerOptional @neondatabase/serverless@">=0.10.0" from drizzle-orm@0.39.1
+[2025-05-05 17:09:18] │ npm warn   node_modules/drizzle-orm
+[2025-05-05 17:09:18] │ npm warn     peer drizzle-orm@">=0.36.0" from drizzle-zod@0.7.0
+[2025-05-05 17:09:18] │ npm warn     node_modules/drizzle-zod
+[2025-05-05 17:09:18] │ npm warn     1 more (the root project)
+[2025-05-05 17:09:18] │ npm warn   1 more (the root project)
+[2025-05-05 17:09:18] │ npm warn
+[2025-05-05 17:09:18] │ npm warn Could not resolve dependency:
+[2025-05-05 17:09:18] │ npm warn peerOptional @neondatabase/serverless@">=0.10.0" from drizzle-orm@0.39.1
+[2025-05-05 17:09:18] │ npm warn node_modules/drizzle-orm
+[2025-05-05 17:09:18] │ npm warn   peer drizzle-orm@">=0.36.0" from drizzle-zod@0.7.0
+[2025-05-05 17:09:18] │ npm warn   node_modules/drizzle-zod
+[2025-05-05 17:09:18] │ npm warn   1 more (the root project)
+[2025-05-05 17:09:18] │ npm warn ERESOLVE overriding peer dependency
+[2025-05-05 17:09:18] │ npm warn While resolving: rest-express@1.0.0
+[2025-05-05 17:09:18] │ npm warn Found: @neondatabase/serverless@0.10.4
+[2025-05-05 17:09:18] │ npm warn node_modules/@neondatabase/serverless
+[2025-05-05 17:09:18] │ npm warn   peerOptional @neondatabase/serverless@">=0.10.0" from drizzle-orm@0.39.1
+[2025-05-05 17:09:18] │ npm warn   node_modules/drizzle-orm
+[2025-05-05 17:09:18] │ npm warn     peer drizzle-orm@">=0.36.0" from drizzle-zod@0.7.0
+[2025-05-05 17:09:18] │ npm warn     node_modules/drizzle-zod
+[2025-05-05 17:09:18] │ npm warn     1 more (the root project)
+[2025-05-05 17:09:18] │ npm warn   1 more (the root project)
+[2025-05-05 17:09:18] │ npm warn
+[2025-05-05 17:09:18] │ npm warn Could not resolve dependency:
+[2025-05-05 17:09:18] │ npm warn peerOptional @neondatabase/serverless@">=0.10.0" from drizzle-orm@0.39.1
+[2025-05-05 17:09:18] │ npm warn node_modules/drizzle-orm
+[2025-05-05 17:09:18] │ npm warn   peer drizzle-orm@">=0.36.0" from drizzle-zod@0.7.0
+[2025-05-05 17:09:18] │ npm warn   node_modules/drizzle-zod
+[2025-05-05 17:09:18] │ npm warn   1 more (the root project)
+[2025-05-05 17:09:19] │ 
+[2025-05-05 17:09:19] │ added 6 packages, changed 1 package, and audited 430 packages in 1s
+[2025-05-05 17:09:19] │ 
+[2025-05-05 17:09:19] │ 57 packages are looking for funding
+[2025-05-05 17:09:19] │   run `npm fund` for details
+[2025-05-05 17:09:19] │ 
+[2025-05-05 17:09:19] │ 2 moderate severity vulnerabilities
+[2025-05-05 17:09:19] │ 
+[2025-05-05 17:09:19] │ To address all issues, run:
+[2025-05-05 17:09:19] │   npm audit fix
+[2025-05-05 17:09:19] │ 
+[2025-05-05 17:09:19] │ Run `npm audit` for details.
+[2025-05-05 17:09:19] │ Creating build directories...
+[2025-05-05 17:09:19] │ Building frontend...
+[2025-05-05 17:09:19] │ 
+[2025-05-05 17:09:19] │ > rest-express@1.0.0 build
+[2025-05-05 17:09:19] │ > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+[2025-05-05 17:09:19] │ 
+[2025-05-05 17:09:19] │ failed to load config from /workspace/vite.config.ts
+[2025-05-05 17:09:19] │ error during build:
+[2025-05-05 17:09:19] │ Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@vitejs/plugin-react' imported from /workspace/vite.config.ts.timestamp-1746464959719-2963a678fa177.mjs
+[2025-05-05 17:09:19] │     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+[2025-05-05 17:09:19] │     at packageResolve (node:internal/modules/esm/resolve:768:81)
+[2025-05-05 17:09:19] │     at moduleResolve (node:internal/modules/esm/resolve:854:18)
+[2025-05-05 17:09:19] │     at defaultResolve (node:internal/modules/esm/resolve:984:11)
+[2025-05-05 17:09:19] │     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+[2025-05-05 17:09:19] │     at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+[2025-05-05 17:09:19] │     at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+[2025-05-05 17:09:19] │     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+[2025-05-05 17:09:19] │     at ModuleJob._link (node:internal/modules/esm/module_job:135:49)
+[2025-05-05 17:09:19] │ building: exit status 1
+[2025-05-05 17:09:19] │ Timer: Builder ran for 24.781971s and ended at 2025-05-05T17:09:19Z
+[2025-05-05 17:09:19] │ ERROR: failed to build: exit status 1
+[2025-05-05 17:09:19] │ 
+[2025-05-05 17:09:19] │ 
+[2025-05-05 17:09:19] │  ✘ build failed
+[]
