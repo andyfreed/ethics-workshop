@@ -354,8 +354,85 @@ cat > dist/public/index.html << 'EOL'
   </footer>
 
   <script>
+    // Handle authentication state
+    let currentUser = null;
+    
+    async function checkAuthStatus() {
+      try {
+        const response = await fetch('/api/user');
+        const data = await response.json();
+        
+        if (data.isAuthenticated && data.user) {
+          currentUser = data.user;
+          updateNavForAuth();
+        }
+      } catch (error) {
+        console.error('Error checking authentication status:', error);
+      }
+    }
+    
+    function updateNavForAuth() {
+      const authLink = document.querySelector('nav a[href="/auth"]');
+      if (authLink) {
+        if (currentUser) {
+          authLink.textContent = 'Admin Dashboard';
+          authLink.href = '/admin';
+        } else {
+          authLink.textContent = 'Admin Login';
+          authLink.href = '/auth';
+        }
+      }
+    }
+    
+    // Handle form submissions
+    async function submitWorkshopRequest(event) {
+      event.preventDefault();
+      
+      // Show loading indicator
+      const submitButton = document.querySelector('#requestForm button');
+      const originalText = submitButton.textContent;
+      submitButton.textContent = 'Submitting...';
+      submitButton.disabled = true;
+      
+      // Get form data
+      const formData = new FormData(document.getElementById('requestForm'));
+      const requestData = Object.fromEntries(formData.entries());
+      
+      try {
+        const response = await fetch('/api/chapter-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestData)
+        });
+        
+        if (response.ok) {
+          // Show success message
+          document.getElementById('requestForm').innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+              <h3 style="color: #4CAF50; margin-bottom: 1rem;">Workshop Request Submitted Successfully!</h3>
+              <p>Thank you for your interest in hosting an Ethics Workshop. We'll contact you within 2 business days to confirm the details.</p>
+              <p>A confirmation has been sent to your email address.</p>
+            </div>
+          `;
+        } else {
+          const error = await response.json();
+          alert(`Error submitting request: ${error.message || 'Please try again later.'}`);
+          submitButton.textContent = originalText;
+          submitButton.disabled = false;
+        }
+      } catch (error) {
+        console.error('Error submitting workshop request:', error);
+        alert('There was a problem submitting your request. Please try again later.');
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      }
+    }
+    
     // Simple client-side routing for the static version
     document.addEventListener('DOMContentLoaded', function() {
+      // Check authentication status on page load
+      checkAuthStatus();
+      
       const links = document.querySelectorAll('a');
       
       links.forEach(link => {
@@ -364,7 +441,7 @@ cat > dist/public/index.html << 'EOL'
           if (this.hostname === window.location.hostname) {
             const path = this.pathname;
             
-            if (path === '/' || path === '/course' || path === '/request') {
+            if (path === '/' || path === '/course' || path === '/request' || path === '/auth' || path === '/admin') {
               e.preventDefault();
               
               // Update the content based on the path
@@ -386,9 +463,7 @@ cat > dist/public/index.html << 'EOL'
       
       // Initial load
       const initialPath = window.location.pathname;
-      if (initialPath === '/' || initialPath === '/course' || initialPath === '/request') {
-        updateContent(initialPath);
-      }
+      updateContent(initialPath);
       
       function updateContent(path) {
         const main = document.querySelector('main');
@@ -467,7 +542,7 @@ cat > dist/public/index.html << 'EOL'
                     <textarea id="notes" name="notes" rows="4" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
                   </div>
                   
-                  <button type="button" class="cta-button" onclick="alert('In the full application, this form would submit your workshop request.')">Submit Request</button>
+                  <button type="button" class="cta-button" onclick="submitWorkshopRequest(event)">Submit Request</button>
                 </form>
               </section>
               
@@ -476,6 +551,333 @@ cat > dist/public/index.html << 'EOL'
                 <p>After submitting your request, you will receive a confirmation email. Our team will review your request and contact you within 2 business days to discuss the details and confirm your workshop date.</p>
               </section>
             `;
+            break;
+            
+          case '/auth':
+            main.innerHTML = `
+              <section class="hero">
+                <h1>Admin Login</h1>
+                <p>Please log in to access the administrative dashboard.</p>
+              </section>
+              
+              <section class="info-section">
+                <div style="max-width: 400px; margin: 0 auto;">
+                  <h2>Login</h2>
+                  <form id="loginForm" style="margin-top: 1.5rem;">
+                    <div style="margin-bottom: 1rem;">
+                      <label for="username" style="display: block; margin-bottom: 0.5rem;">Username:</label>
+                      <input type="text" id="username" name="username" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" value="admin">
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                      <label for="password" style="display: block; margin-bottom: 0.5rem;">Password:</label>
+                      <input type="password" id="password" name="password" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" value="password">
+                      <small style="color: #666; margin-top: 0.25rem; display: block;">Demo credentials: admin / password</small>
+                    </div>
+                    
+                    <button type="button" class="cta-button" onclick="handleLogin()" style="width: 100%;">Log In</button>
+                  </form>
+                </div>
+              </section>
+            `;
+            
+            // Add the login handler function
+            window.handleLogin = async function() {
+              const username = document.getElementById('username').value;
+              const password = document.getElementById('password').value;
+              
+              if (!username || !password) {
+                alert('Please enter both username and password.');
+                return;
+              }
+              
+              const loginButton = document.querySelector('#loginForm button');
+              loginButton.textContent = 'Logging in...';
+              loginButton.disabled = true;
+              
+              try {
+                const response = await fetch('/api/login', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                  const data = await response.json();
+                  currentUser = data.user;
+                  updateNavForAuth();
+                  
+                  // Redirect to admin dashboard
+                  updateContent('/admin');
+                  window.history.pushState({path: '/admin'}, '', '/admin');
+                } else {
+                  const error = await response.json();
+                  alert(`Login failed: ${error.message || 'Invalid credentials'}`);
+                }
+              } catch (error) {
+                console.error('Login error:', error);
+                alert('An error occurred during login. Please try again.');
+              }
+              
+              loginButton.textContent = 'Log In';
+              loginButton.disabled = false;
+            };
+            break;
+            
+          case '/admin':
+            // If not logged in, redirect to login page
+            if (!currentUser) {
+              updateContent('/auth');
+              window.history.pushState({path: '/auth'}, '', '/auth');
+              break;
+            }
+            
+            main.innerHTML = `
+              <section class="hero">
+                <h1>Admin Dashboard</h1>
+                <p>Welcome to the Ethics Workshop administrative dashboard.</p>
+              </section>
+              
+              <div style="display: flex; margin-bottom: 2rem;">
+                <div style="flex: 1; margin-right: 1rem;">
+                  <div class="info-section" style="height: 100%;">
+                    <h2>Quick Stats</h2>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
+                      <div style="background: #f5f5f5; padding: 1rem; border-radius: var(--radius); text-align: center;">
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--primary);">2</div>
+                        <div>Pending Requests</div>
+                      </div>
+                      <div style="background: #f5f5f5; padding: 1rem; border-radius: var(--radius); text-align: center;">
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--primary);">1</div>
+                        <div>Upcoming Workshops</div>
+                      </div>
+                      <div style="background: #f5f5f5; padding: 1rem; border-radius: var(--radius); text-align: center;">
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--primary);">0</div>
+                        <div>Pending Reports</div>
+                      </div>
+                      <div style="background: #f5f5f5; padding: 1rem; border-radius: var(--radius); text-align: center;">
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--primary);">$995</div>
+                        <div>Revenue per Workshop</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div style="flex: 1;">
+                  <div class="info-section" style="height: 100%;">
+                    <h2>Admin Actions</h2>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                      <a href="#" onclick="loadAdminSection('chapter-requests')" class="cta-button" style="text-align: center;">View Chapter Requests</a>
+                      <a href="#" onclick="loadAdminSection('workshop-sessions')" class="cta-button" style="text-align: center;">Manage Workshop Sessions</a>
+                      <a href="#" onclick="loadAdminSection('participants')" class="cta-button" style="text-align: center;">View Participant Data</a>
+                      <a href="#" onclick="handleLogout()" class="cta-button" style="text-align: center; background-color: #f44336;">Logout</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div id="adminContent" class="info-section">
+                <h2>Chapter Requests</h2>
+                <div id="adminDataLoading" style="text-align: center; padding: 2rem;">
+                  <p>Loading chapter requests...</p>
+                </div>
+                <div id="adminDataContent" style="display: none;"></div>
+              </div>
+            `;
+            
+            // Add admin section loader function
+            window.loadAdminSection = async function(section) {
+              const contentDiv = document.getElementById('adminContent');
+              const loadingDiv = document.getElementById('adminDataLoading');
+              const dataDiv = document.getElementById('adminDataContent');
+              
+              loadingDiv.style.display = 'block';
+              dataDiv.style.display = 'none';
+              
+              let title = '';
+              let endpoint = '';
+              
+              switch(section) {
+                case 'chapter-requests':
+                  title = 'Chapter Requests';
+                  endpoint = '/api/chapter-requests';
+                  break;
+                case 'workshop-sessions':
+                  title = 'Workshop Sessions';
+                  endpoint = '/api/workshop-sessions';
+                  break;
+                case 'participants':
+                  title = 'Participant Data';
+                  endpoint = '/api/participants';
+                  break;
+                default:
+                  title = 'Chapter Requests';
+                  endpoint = '/api/chapter-requests';
+              }
+              
+              contentDiv.querySelector('h2').textContent = title;
+              
+              try {
+                const response = await fetch(endpoint);
+                if (response.ok) {
+                  const data = await response.json();
+                  
+                  if (section === 'chapter-requests') {
+                    renderChapterRequestsTable(data);
+                  } else if (section === 'workshop-sessions') {
+                    renderWorkshopSessionsTable(data);
+                  } else {
+                    dataDiv.innerHTML = '<p>Data display not implemented in this preview.</p>';
+                  }
+                } else {
+                  dataDiv.innerHTML = '<p>Error loading data. Please try again.</p>';
+                }
+              } catch (error) {
+                console.error(`Error loading ${section}:`, error);
+                dataDiv.innerHTML = '<p>Error loading data. Please try again.</p>';
+              }
+              
+              loadingDiv.style.display = 'none';
+              dataDiv.style.display = 'block';
+            };
+            
+            // Add renderer for chapter requests table
+            window.renderChapterRequestsTable = function(data) {
+              const dataDiv = document.getElementById('adminDataContent');
+              
+              if (!data || data.length === 0) {
+                dataDiv.innerHTML = '<p>No chapter requests found.</p>';
+                return;
+              }
+              
+              let html = `
+                <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                  <thead>
+                    <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+                      <th style="padding: 0.75rem; text-align: left;">Chapter</th>
+                      <th style="padding: 0.75rem; text-align: left;">Contact</th>
+                      <th style="padding: 0.75rem; text-align: left;">Date</th>
+                      <th style="padding: 0.75rem; text-align: left;">Status</th>
+                      <th style="padding: 0.75rem; text-align: left;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+              `;
+              
+              data.forEach(request => {
+                html += `
+                  <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 0.75rem;">${request.chapterName}</td>
+                    <td style="padding: 0.75rem;">${request.contactName}<br><small>${request.contactEmail}</small></td>
+                    <td style="padding: 0.75rem;">${new Date(request.preferredDate).toLocaleDateString()}</td>
+                    <td style="padding: 0.75rem;">
+                      <span style="padding: 0.25rem 0.5rem; border-radius: 4px; background-color: ${request.status === 'pending' ? '#FFC107' : '#4CAF50'}; color: white;">
+                        ${request.status === 'pending' ? 'Pending' : 'Approved'}
+                      </span>
+                    </td>
+                    <td style="padding: 0.75rem;">
+                      <button class="cta-button" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" 
+                        onclick="alert('In the full application, this would allow you to approve or edit the request.')">
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              });
+              
+              html += `
+                  </tbody>
+                </table>
+              `;
+              
+              dataDiv.innerHTML = html;
+            };
+            
+            // Add renderer for workshop sessions table
+            window.renderWorkshopSessionsTable = function(data) {
+              const dataDiv = document.getElementById('adminDataContent');
+              
+              if (!data || data.length === 0) {
+                dataDiv.innerHTML = '<p>No workshop sessions found.</p>';
+                return;
+              }
+              
+              let html = `
+                <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                  <thead>
+                    <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+                      <th style="padding: 0.75rem; text-align: left;">Chapter</th>
+                      <th style="padding: 0.75rem; text-align: left;">Date</th>
+                      <th style="padding: 0.75rem; text-align: left;">Location</th>
+                      <th style="padding: 0.75rem; text-align: left;">Status</th>
+                      <th style="padding: 0.75rem; text-align: left;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+              `;
+              
+              data.forEach(session => {
+                html += `
+                  <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 0.75rem;">${session.chapterName}</td>
+                    <td style="padding: 0.75rem;">${new Date(session.date).toLocaleDateString()}</td>
+                    <td style="padding: 0.75rem;">${session.location}</td>
+                    <td style="padding: 0.75rem;">
+                      <span style="padding: 0.25rem 0.5rem; border-radius: 4px; background-color: ${session.status === 'scheduled' ? '#4CAF50' : '#FFC107'}; color: white;">
+                        ${session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                      </span>
+                    </td>
+                    <td style="padding: 0.75rem;">
+                      <button class="cta-button" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin-right: 0.5rem;"
+                        onclick="alert('In the full application, this would allow you to view participant data.')">
+                        View Participants
+                      </button>
+                      <button class="cta-button" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; background-color: ${session.reported ? '#4CAF50' : '#FFC107'};"
+                        onclick="alert('In the full application, this would allow you to mark the session as reported to the CFP Board.')">
+                        ${session.reported ? 'Reported' : 'Report to CFP'}
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              });
+              
+              html += `
+                  </tbody>
+                </table>
+              `;
+              
+              dataDiv.innerHTML = html;
+            };
+            
+            // Add logout handler
+            window.handleLogout = async function() {
+              try {
+                const response = await fetch('/api/logout', {
+                  method: 'POST'
+                });
+                
+                if (response.ok) {
+                  currentUser = null;
+                  updateNavForAuth();
+                  
+                  // Redirect to home page
+                  updateContent('/');
+                  window.history.pushState({path: '/'}, '', '/');
+                  
+                  alert('Logged out successfully.');
+                } else {
+                  alert('Error logging out. Please try again.');
+                }
+              } catch (error) {
+                console.error('Logout error:', error);
+                alert('An error occurred during logout. Please try again.');
+              }
+            };
+            
+            // Load chapter requests by default
+            setTimeout(() => {
+              window.loadAdminSection('chapter-requests');
+            }, 500);
             break;
             
           default: // Home page
@@ -555,10 +957,57 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
-// API endpoints
+// Authentication system
+let isAuthenticated = false;
+let currentUser = null;
+
+// Login endpoint
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  
+  // Simple authentication for the demo
+  if (username === 'admin' && password === 'password') {
+    isAuthenticated = true;
+    currentUser = {
+      id: 1,
+      username: 'admin',
+      name: 'Admin User',
+      isAdmin: true
+    };
+    
+    res.json({
+      message: 'Login successful',
+      user: currentUser
+    });
+  } else {
+    res.status(401).json({
+      message: 'Invalid credentials'
+    });
+  }
+});
+
+// Logout endpoint
+app.post('/api/logout', (req, res) => {
+  isAuthenticated = false;
+  currentUser = null;
+  
+  res.json({
+    message: 'Logout successful'
+  });
+});
+
+// Get current user endpoint
 app.get('/api/user', (req, res) => {
-  // Simplified authentication check without database access
-  res.json({ isAuthenticated: false });
+  if (isAuthenticated && currentUser) {
+    res.json({
+      isAuthenticated: true,
+      user: currentUser
+    });
+  } else {
+    res.json({
+      isAuthenticated: false
+    });
+  }
 });
 
 // Admin-only mock API endpoint
@@ -600,6 +1049,56 @@ app.get('/api/workshop-sessions', (req, res) => {
       location: "Palo Alto Community Center",
       status: "scheduled",
       reported: false
+    }
+  ]);
+});
+
+// Post a new chapter request 
+app.post('/api/chapter-requests', (req, res) => {
+  const { chapterName, contactName, contactEmail, contactPhone, preferredDate, notes } = req.body;
+  
+  // Simple validation
+  if (!chapterName || !contactName || !contactEmail || !preferredDate) {
+    return res.status(400).json({
+      message: 'Please provide all required fields: chapter name, contact name, contact email, and preferred date'
+    });
+  }
+  
+  // In a real application, this would save to the database
+  // Here we're just returning success
+  res.status(201).json({
+    id: Date.now(), // Use timestamp as ID for demo
+    chapterName,
+    contactName,
+    contactEmail,
+    contactPhone,
+    preferredDate,
+    notes,
+    status: 'pending',
+    createdAt: new Date().toISOString()
+  });
+});
+
+// Get participant data (admin only, would be authenticated in the full app)
+app.get('/api/participants', (req, res) => {
+  res.json([
+    {
+      id: 1,
+      sessionId: 1,
+      name: "John Doe",
+      email: "john@example.com",
+      cfpId: "123456",
+      reported: false,
+      createdAt: "2025-06-15T10:30:00Z"
+    },
+    {
+      id: 2,
+      sessionId: 1,
+      name: "Jane Smith",
+      email: "jane@example.com",
+      cfpId: "789012",
+      reported: false,
+      createdAt: "2025-06-15T10:45:00Z"
     }
   ]);
 });
