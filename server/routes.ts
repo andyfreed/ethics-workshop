@@ -451,6 +451,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).send('Error reading SQL file');
     }
   });
+  
+  // Health check endpoint for production deployments
+  app.get('/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'ok',
+      time: new Date().toISOString()
+    });
+  });
 
   return httpServer;
 }
