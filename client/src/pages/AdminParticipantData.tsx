@@ -24,9 +24,9 @@ import { Input } from "@/components/ui/input";
 
 export default function AdminParticipantData() {
   const { toast } = useToast();
-  const [filterChapter, setFilterChapter] = useState("");
-  const [filterDate, setFilterDate] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterChapter, setFilterChapter] = useState("all-chapters");
+  const [filterDate, setFilterDate] = useState("all-dates");
+  const [filterStatus, setFilterStatus] = useState("all-statuses");
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: sessions = [] } = useQuery({
@@ -115,17 +115,17 @@ export default function AdminParticipantData() {
   };
 
   // Get chapter name from session
-  const getChapterName = (sessionId: number) => {
-    if (!sessions) return "Unknown";
-    const session = sessions.find((s: any) => s.id === sessionId);
-    return session ? session.chapterName : "Unknown";
+  const getChapterName = (sessionId: number | null) => {
+    if (!sessionId || !Array.isArray(sessions) || sessions.length === 0) return "Unknown";
+    const session = sessions.find((s) => s.id === sessionId);
+    return session?.chapterName || "Unknown";
   };
 
   // Get formatted date from session
-  const getSessionDate = (sessionId: number) => {
-    if (!sessions) return "Unknown";
-    const session = sessions.find((s: any) => s.id === sessionId);
-    return session ? formatDate(session.workshopDate) : "Unknown";
+  const getSessionDate = (sessionId: number | null) => {
+    if (!sessionId || !Array.isArray(sessions) || sessions.length === 0) return "Unknown";
+    const session = sessions.find((s) => s.id === sessionId);
+    return session?.workshopDate ? formatDate(session.workshopDate) : "Unknown";
   };
 
   const formatDate = (dateString: string) => {
@@ -137,40 +137,59 @@ export default function AdminParticipantData() {
   };
 
   // Filter and search participants
-  const filteredParticipants = participants ? participants.filter((participant: any) => {
+  const filteredParticipants = Array.isArray(participants) ? participants.filter((participant: any) => {
     // Filter by chapter
-    if (filterChapter && getChapterName(participant.sessionId) !== filterChapter) {
+    if (filterChapter && filterChapter !== "all-chapters" && getChapterName(participant.sessionId) !== filterChapter) {
       return false;
     }
     
-    // Filter by date range - simplified for now
-    if (filterDate === "current_month") {
-      const sessionDate = sessions?.find((s: any) => s.id === participant.sessionId)?.workshopDate;
+    // Filter by date range
+    if (filterDate && filterDate !== "all-dates") {
+      const sessionDate = Array.isArray(sessions) ? 
+        sessions.find((s) => s.id === participant.sessionId)?.workshopDate : null;
+      
       if (sessionDate) {
         const date = new Date(sessionDate);
         const now = new Date();
-        if (date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear()) {
-          return false;
+        
+        if (filterDate === "current_month") {
+          if (date.getMonth() !== now.getMonth() || date.getFullYear() !== now.getFullYear()) {
+            return false;
+          }
+        } else if (filterDate === "last_3_months") {
+          // Calculate date 3 months ago
+          const threeMonthsAgo = new Date();
+          threeMonthsAgo.setMonth(now.getMonth() - 3);
+          if (date < threeMonthsAgo) {
+            return false;
+          }
+        } else if (filterDate === "ytd") {
+          // Year to date - current year only
+          if (date.getFullYear() !== now.getFullYear()) {
+            return false;
+          }
         }
       }
     }
     
     // Filter by reporting status
-    if (filterStatus === "reported" && !participant.reportedToCfpBoard) {
-      return false;
-    }
-    if (filterStatus === "pending" && participant.reportedToCfpBoard) {
-      return false;
+    if (filterStatus && filterStatus !== "all-statuses") {
+      if (filterStatus === "reported" && !participant.reportedToCfpBoard) {
+        return false;
+      }
+      if (filterStatus === "pending" && participant.reportedToCfpBoard) {
+        return false;
+      }
     }
     
-    // Search by name or CFP ID
+    // Search by name, CFP ID, or email
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       return (
-        participant.firstName.toLowerCase().includes(searchLower) ||
-        participant.lastName.toLowerCase().includes(searchLower) ||
-        participant.cfpId.includes(searchTerm) ||
-        participant.email.toLowerCase().includes(searchLower)
+        participant.firstName?.toLowerCase().includes(searchLower) ||
+        participant.lastName?.toLowerCase().includes(searchLower) ||
+        participant.cfpId?.includes(searchTerm) ||
+        participant.email?.toLowerCase().includes(searchLower)
       );
     }
     
@@ -222,11 +241,13 @@ export default function AdminParticipantData() {
                 <SelectValue placeholder="All Chapters" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Chapters</SelectItem>
-                {sessions?.map((session: any) => (
-                  <SelectItem key={session.chapterName} value={session.chapterName}>
-                    {session.chapterName}
-                  </SelectItem>
+                <SelectItem value="all-chapters">All Chapters</SelectItem>
+                {Array.isArray(sessions) && sessions.map((session: any) => (
+                  session.chapterName ? (
+                    <SelectItem key={session.id} value={session.chapterName || `chapter-${session.id}`}>
+                      {session.chapterName || `Workshop #${session.id}`}
+                    </SelectItem>
+                  ) : null
                 ))}
               </SelectContent>
             </Select>
@@ -237,7 +258,7 @@ export default function AdminParticipantData() {
                 <SelectValue placeholder="All Dates" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Dates</SelectItem>
+                <SelectItem value="all-dates">All Dates</SelectItem>
                 <SelectItem value="current_month">Current Month</SelectItem>
                 <SelectItem value="last_3_months">Last 3 Months</SelectItem>
                 <SelectItem value="ytd">Year to Date</SelectItem>
@@ -250,7 +271,7 @@ export default function AdminParticipantData() {
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all-statuses">All Statuses</SelectItem>
                 <SelectItem value="reported">Reported to CFP Board</SelectItem>
                 <SelectItem value="pending">Pending Reporting</SelectItem>
               </SelectContent>
