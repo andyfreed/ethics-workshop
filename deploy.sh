@@ -7,58 +7,53 @@ set -e
 
 echo "Preparing for deployment..."
 
-# Install dependencies with explicit dev dependencies needed for build
+# Install dependencies including dev dependencies needed for the build
 echo "Installing dependencies and build tools..."
 npm install --production=false
-npm install @vitejs/plugin-react vite esbuild @tailwindcss/vite --no-save
+npm install --no-save @vitejs/plugin-react vite esbuild @tailwindcss/vite tsx postcss autoprefixer tailwindcss
 
 # Force install a specific version of Neon Database driver that works
 echo "Installing compatible database driver..."
-npm install @neondatabase/serverless@0.7.2
+npm install --no-save @neondatabase/serverless@0.7.2
 
 # Create required directories
 echo "Creating build directories..."
+mkdir -p dist
 mkdir -p dist/client
 mkdir -p server/public
 mkdir -p dist/public
 
-# Create a placeholder file in server/public
-echo '<html><body><h1>Ethics Workshop</h1></body></html>' > server/public/index.html
-echo '<html><body><h1>Ethics Workshop</h1></body></html>' > dist/public/index.html
+# Run the prepare-deployment script to create necessary files
+echo "Running prepare-deployment script..."
+node prepare-deployment.js
 
-# Create a simple serve script instead of using build
-echo "Creating a manual build approach..."
-echo "// This is a simplified build approach" > dist/index.js
-echo "import { createServer } from 'http';" >> dist/index.js
-echo "import express from 'express';" >> dist/index.js
-echo "import path from 'path';" >> dist/index.js
-echo "import { fileURLToPath } from 'url';" >> dist/index.js
-echo "" >> dist/index.js
-echo "const __dirname = path.dirname(fileURLToPath(import.meta.url));" >> dist/index.js
-echo "const app = express();" >> dist/index.js
-echo "app.use(express.json());" >> dist/index.js
-echo "" >> dist/index.js
-echo "// Serve static files" >> dist/index.js
-echo "app.use(express.static(path.join(__dirname, 'public')));" >> dist/index.js
-echo "" >> dist/index.js
-echo "// Add health check endpoint" >> dist/index.js
-echo "app.get('/health', (req, res) => res.send('OK'));" >> dist/index.js
-echo "" >> dist/index.js
-echo "// Add API endpoint for compatibility" >> dist/index.js
-echo "app.get('/api/user', (req, res) => res.json({ isAuthenticated: false }));" >> dist/index.js
-echo "" >> dist/index.js
-echo "// Handle all routes for SPA" >> dist/index.js
-echo "app.get('*', (req, res) => {" >> dist/index.js
-echo "  res.sendFile(path.join(__dirname, 'public', 'index.html'));" >> dist/index.js
-echo "});" >> dist/index.js
-echo "" >> dist/index.js
-echo "const PORT = process.env.PORT || 8080;" >> dist/index.js
-echo "const server = createServer(app);" >> dist/index.js
-echo "" >> dist/index.js
-echo "server.listen(PORT, '0.0.0.0', () => {" >> dist/index.js
-echo "  console.log(\`Server running at http://0.0.0.0:\${PORT}/\`);" >> dist/index.js
-echo "});" >> dist/index.js
+# Copy the server directory to dist for direct execution
+echo "Copying server files..."
+cp -r server dist/
+
+# Copy the shared directory to dist for schema access
+echo "Copying shared files..."
+cp -r shared dist/
+
+# Create a health check endpoint handler
+echo "Creating health check endpoint..."
+cat > dist/server/health.js << EOL
+export function setupHealthCheck(app) {
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
+}
+EOL
+
+# Update server/index.ts to import the health check module
+echo "Updating server entry point for health check..."
+if ! grep -q "setupHealthCheck" dist/server/index.ts; then
+  sed -i '/import/a import { setupHealthCheck } from "./health.js";' dist/server/index.ts
+  sed -i '/registerRoutes/a setupHealthCheck(app);' dist/server/index.ts
+fi
 
 # Create a Procfile for Digital Ocean
 echo "Creating Procfile..."
-echo "web: NODE_ENV=production node dist/index.js" > Procfile
+echo "web: NODE_ENV=production PORT=8080 npx tsx dist/server/index.ts" > Procfile
+
+echo "Deployment preparation complete!"
