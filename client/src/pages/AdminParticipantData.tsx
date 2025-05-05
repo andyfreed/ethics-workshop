@@ -31,10 +31,19 @@ export default function AdminParticipantData() {
 
   const { data: sessions = [] } = useQuery({
     queryKey: ["/api/workshop-sessions"],
+    retry: 2,
+    retryDelay: 1000,
   });
 
-  const { data: participants = [], isLoading, isError } = useQuery({
+  const { 
+    data: participants = [], 
+    isLoading, 
+    isError,
+    refetch: refetchParticipants
+  } = useQuery({
     queryKey: ["/api/participants"],
+    retry: 2,
+    retryDelay: 1000,
   });
 
   const markReportedMutation = useMutation({

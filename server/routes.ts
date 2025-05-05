@@ -38,7 +38,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     secret: process.env.SESSION_SECRET || 'ethics-workshop-secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 24 hours
+    cookie: { 
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    },
     store: new MemoryStoreSession({
       checkPeriod: 86400000 // prune expired entries every 24h
     })
@@ -140,12 +145,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const requestData = insertChapterRequestSchema.parse(req.body);
       const newRequest = await storage.createChapterRequest(requestData);
       
-      // Sync the new chapter request to Supabase
-      try {
-        await syncChapterRequestToSupabase(newRequest);
-      } catch (syncErr) {
-        console.error('Error syncing to Supabase:', syncErr);
-        // Continue with the response even if sync fails
+      // Only try to sync if Supabase is connected
+      if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        try {
+          await syncChapterRequestToSupabase(newRequest);
+        } catch (syncErr) {
+          console.error('Error syncing to Supabase:', syncErr);
+          // Continue with the response even if sync fails
+        }
       }
       
       // Send email notification
@@ -181,12 +188,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ message: "Chapter request not found" });
     }
     
-    // Sync the updated chapter request to Supabase
-    try {
-      await syncChapterRequestToSupabase(updatedRequest);
-    } catch (syncErr) {
-      console.error('Error syncing updated chapter request to Supabase:', syncErr);
-      // Continue with the response even if sync fails
+    // Only try to sync if Supabase is connected
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        await syncChapterRequestToSupabase(updatedRequest);
+      } catch (syncErr) {
+        console.error('Error syncing updated chapter request to Supabase:', syncErr);
+        // Continue with the response even if sync fails
+      }
     }
     
     res.json(updatedRequest);
@@ -270,9 +279,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const participantData = insertParticipantSchema.parse(req.body);
       
       // Verify that the session exists
-      const session = await storage.getWorkshopSessionById(participantData.sessionId);
-      if (!session) {
-        return res.status(404).json({ message: "Workshop session not found" });
+      if (participantData.sessionId !== undefined) {
+        const session = await storage.getWorkshopSessionById(participantData.sessionId);
+        if (!session) {
+          return res.status(404).json({ message: "Workshop session not found" });
+        }
+      } else {
+        return res.status(400).json({ message: "Session ID is required" });
       }
       
       const newParticipant = await storage.createParticipant(participantData);
@@ -329,6 +342,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Sync data to Supabase (no auth required)
   app.post('/api/sync/supabase', async (req, res) => {
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return res.status(503).json({ 
+        success: false, 
+        message: "Supabase connection is not configured"
+      });
+    }
+    
     try {
       await syncAllDataToSupabase();
       res.json({ success: true, message: "Data successfully synced to Supabase" });
