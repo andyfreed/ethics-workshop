@@ -10,17 +10,40 @@ async function throwIfResNotOk(res: Response) {
 export async function apiRequest(
   method: string,
   url: string,
-  data?: unknown | undefined,
-): Promise<Response> {
-  const res = await fetch(url, {
-    method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
+  data?: unknown | null | undefined,
+): Promise<any> {
+  try {
+    const headers: Record<string, string> = {};
+    if (data) {
+      headers["Content-Type"] = "application/json";
+    }
+    
+    // Add cache-busting for GET requests to prevent browser caching
+    const urlWithCacheBusting = method === 'GET' 
+      ? `${url}${url.includes('?') ? '&' : '?'}_t=${Date.now()}` 
+      : url;
+    
+    const res = await fetch(urlWithCacheBusting, {
+      method,
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include", // Always include credentials for session cookies
+      cache: "no-store" // Prevent caching
+    });
 
-  await throwIfResNotOk(res);
-  return res;
+    await throwIfResNotOk(res);
+    
+    // For non-GET methods or empty responses, just return the response object
+    if (method !== 'GET' || res.status === 204) {
+      return res;
+    }
+    
+    // For GET requests, parse the JSON and return the data
+    return await res.json();
+  } catch (error) {
+    console.error(`API request error (${method} ${url}):`, error);
+    throw error;
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -29,16 +52,32 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
-      credentials: "include",
-    });
+    try {
+      // Add cache-busting to prevent browser caching
+      const url = queryKey[0] as string;
+      const urlWithCacheBusting = `${url}${url.includes('?') ? '&' : '?'}_t=${Date.now()}`;
+      
+      const res = await fetch(urlWithCacheBusting, {
+        credentials: "include",
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache, no-store'
+        },
+        cache: "no-store"
+      });
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        console.warn(`Auth error on ${url} - using fallback behavior`);
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error(`Query error (${queryKey[0]}):`, error);
+      throw error;
     }
-
-    await throwIfResNotOk(res);
-    return await res.json();
   };
 
 export const queryClient = new QueryClient({

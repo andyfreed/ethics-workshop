@@ -36,13 +36,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const MemoryStoreSession = MemoryStore(session);
   app.use(session({
     secret: process.env.SESSION_SECRET || 'ethics-workshop-secret',
-    resave: false,
-    saveUninitialized: false,
+    resave: true, // Changed to true to ensure the session is saved back to the store
+    saveUninitialized: true, // Changed to true to create cookie even if not logged in
     cookie: { 
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for longer persistence
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
+      sameSite: 'lax',
+      path: '/' // Ensure cookie is available on all paths
     },
     store: new MemoryStoreSession({
       checkPeriod: 86400000 // prune expired entries every 24h
@@ -93,14 +94,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(401).json({ message: "Unauthorized" });
   }
   
-  // Authentication routes
-  app.post('/api/login', passport.authenticate('local'), (req, res) => {
-    res.json({ message: "Login successful", user: req.user });
+  // Authentication routes with improved error handling
+  app.post('/api/login', (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+      if (err) {
+        console.error('Login error:', err);
+        return res.status(500).json({ message: "Internal server error during login" });
+      }
+      
+      if (!user) {
+        return res.status(401).json({ message: info?.message || "Authentication failed" });
+      }
+      
+      // Log in the user
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          console.error('Session save error:', loginErr);
+          return res.status(500).json({ message: "Failed to establish session" });
+        }
+        
+        // Force session save to ensure cookie is set properly
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error('Session save error:', saveErr);
+            return res.status(500).json({ message: "Failed to save session" });
+          }
+          
+          return res.json({ 
+            message: "Login successful", 
+            user: req.user,
+            sessionID: req.sessionID // Include session ID for debugging
+          });
+        });
+      });
+    })(req, res, next);
   });
   
   app.post('/api/logout', (req, res) => {
+    // Get the session ID before destroying
+    const sessionID = req.sessionID;
+    
+    // First logout the user (remove req.user)
     req.logout(() => {
-      res.json({ message: "Logout successful" });
+      // Then destroy the session completely
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Error destroying session during logout:', err);
+          return res.status(500).json({ message: "Failed to completely logout" });
+        }
+        
+        // Clear cookie on client side too
+        res.clearCookie('connect.sid');
+        
+        res.json({ 
+          message: "Logout successful",
+          sessionID: sessionID // Return for debugging
+        });
+      });
     });
   });
   
