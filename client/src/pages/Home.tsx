@@ -1,11 +1,42 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, DollarSign, ClipboardCheck } from "lucide-react";
+import { ArrowRight, Award, DollarSign, ClipboardCheck, Shield } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
+  const { isAuthenticated, user } = useAuth();
+  const isAdmin = user?.isAdmin || user?.is_admin;
+  const [, navigate] = useLocation();
+  console.log('isAuthenticated:', isAuthenticated, 'user:', user);
   return (
     <div className="space-y-8">
+      {/* Admin Menu */}
+      {isAuthenticated && isAdmin && (
+        <section className="p-6 rounded-lg bg-accent/10 border border-accent mb-8">
+          <div className="flex items-center mb-4">
+            <Shield className="h-6 w-6 text-accent mr-2" />
+            <h2 className="text-lg font-bold text-accent">Admin Menu</h2>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/admin/workshop-sessions">
+              <span className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent/20 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer">
+                Workshop Sessions
+              </span>
+            </Link>
+            <Link href="/admin/chapter-requests">
+              <span className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent/20 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer">
+                Chapter Requests
+              </span>
+            </Link>
+            <Link href="/admin/participant-data">
+              <span className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent/20 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer">
+                Participant Data
+              </span>
+            </Link>
+          </div>
+        </section>
+      )}
       <section className="p-6 sm:p-10 rounded-lg bg-white border border-border shadow-md">
         <div className="max-w-3xl mx-auto text-center relative">
           <div className="mb-8">

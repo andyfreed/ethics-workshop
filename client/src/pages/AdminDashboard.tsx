@@ -35,7 +35,6 @@ export default function AdminDashboard() {
   const [, params] = useRoute("/admin/:tab?");
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("sessions");
-  const [loginOpen, setLoginOpen] = useState(false);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -55,7 +54,6 @@ export default function AdminDashboard() {
     },
     onSuccess: () => {
       login();
-      setLoginOpen(false);
       toast({
         title: "Logged in",
         description: "You have been successfully logged in.",
@@ -78,8 +76,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (params?.tab) {
       const tab = params.tab;
-      
-      // Map URL paths to tab values
       if (tab === "workshop-sessions") {
         setActiveTab("sessions");
       } else if (tab === "chapter-requests") {
@@ -90,31 +86,18 @@ export default function AdminDashboard() {
         setActiveTab(tab);
       }
     } else {
-      // Default to sessions tab if no tab specified
       setActiveTab("sessions");
     }
   }, [params]);
 
-  // Effect to check authentication status
   useEffect(() => {
-    // Never show login dialog during loading
-    if (isLoading) {
-      setLoginOpen(false);
-      return;
+    if (isAuthenticated && user && !user.isAdmin) {
+      setLocation("/");
     }
-    
-    // Only after loading is complete, check authentication status
-    if (!isAuthenticated || user === null) {
-      setLoginOpen(true);
-    } else {
-      // If authenticated, ensure login modal is closed
-      setLoginOpen(false);
-    }
-  }, [isAuthenticated, user, isLoading]);
+  }, [isAuthenticated, user, setLocation]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    // Ensure URL matches tab value exactly
     if (value === "sessions") {
       setLocation(`/admin/workshop-sessions`);
     } else if (value === "chapter-requests") {
@@ -130,13 +113,6 @@ export default function AdminDashboard() {
     loginMutation.mutate(values);
   };
 
-  // Redirect to home if not admin
-  if (isAuthenticated && user && !user.isAdmin) {
-    setLocation("/");
-    return null;
-  }
-
-  // If still loading authentication, show a loading indicator instead of login
   if (isLoading) {
     return (
       <Card className="min-h-[500px] flex items-center justify-center">
@@ -150,17 +126,15 @@ export default function AdminDashboard() {
     );
   }
 
+  if (isAuthenticated && user && !user.isAdmin) {
+    return null;
+  }
+
   return (
     <>
       <Dialog 
-        open={loginOpen} 
-        onOpenChange={(open) => {
-          // Only allow closing if authenticated
-          if (!open && !isAuthenticated) {
-            return;
-          }
-          setLoginOpen(open);
-        }}
+        open={!isAuthenticated || !user?.isAdmin}
+        onOpenChange={() => {}}
       >
         <DialogContent>
           <DialogHeader>
@@ -169,7 +143,6 @@ export default function AdminDashboard() {
               Please login with your admin credentials to access the dashboard.
             </DialogDescription>
           </DialogHeader>
-          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -185,7 +158,6 @@ export default function AdminDashboard() {
                   </FormItem>
                 )}
               />
-              
               <FormField
                 control={form.control}
                 name="password"
@@ -199,7 +171,6 @@ export default function AdminDashboard() {
                   </FormItem>
                 )}
               />
-              
               <DialogFooter>
                 <Button 
                   type="submit" 
@@ -213,13 +184,11 @@ export default function AdminDashboard() {
           </Form>
         </DialogContent>
       </Dialog>
-      
       <Card>
         <div className="px-4 py-5 sm:px-6 bg-gradient-to-r from-primary-500 to-primary-600">
           <h1 className="text-xl leading-6 font-bold text-white">Admin Dashboard</h1>
           <p className="mt-1 max-w-2xl text-sm text-white opacity-90">Manage workshop sessions and participant data</p>
         </div>
-        
         {isAuthenticated && user?.isAdmin && (
           <Tabs value={activeTab} onValueChange={handleTabChange}>
             <div className="border-b px-4">
@@ -244,16 +213,13 @@ export default function AdminDashboard() {
                 </TabsTrigger>
               </TabsList>
             </div>
-            
             <CardContent className="p-4">
               <TabsContent value="sessions" className="mt-0 p-0">
                 <AdminWorkshopSessions />
               </TabsContent>
-              
               <TabsContent value="chapter-requests" className="mt-0 p-0">
                 <AdminChapterRequests />
               </TabsContent>
-              
               <TabsContent value="participants" className="mt-0 p-0">
                 <AdminParticipantData />
               </TabsContent>

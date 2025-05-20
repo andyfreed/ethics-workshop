@@ -18,8 +18,21 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(
   cors({
-    origin: app.get("env") === "production" ? false : process.env.VITE_DEV_SERVER_URL,
-  }),
+    origin: (origin, callback) => {
+      // Always allow localhost:5173 in development
+      if (app.get("env") === "development") {
+        callback(null, ["http://localhost:5173"]);
+        return;
+      }
+      // In production, use the VITE_DEV_SERVER_URL or restrict as needed
+      if (process.env.VITE_DEV_SERVER_URL) {
+        callback(null, [process.env.VITE_DEV_SERVER_URL]);
+      } else {
+        callback(null, false);
+      }
+    },
+    credentials: true,
+  })
 );
 
 // API request logger middleware

@@ -164,10 +164,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sessionExpiryTime = req.session.cookie.expires ? 
         new Date(req.session.cookie.expires).getTime() : 
         Date.now() + (24 * 60 * 60 * 1000); // Default 24 hours
-      
+
+      // Patch: Ensure isAdmin is set for admin users
+      let user = req.user;
+      if (user && (user as any).username && (user as any).username.toLowerCase() === 'admin') {
+        user = { ...user, isAdmin: true };
+      }
+
       res.json({ 
         isAuthenticated: true, 
-        user: req.user, 
+        user, 
         sessionExpires: sessionExpiryTime,
         sessionID: req.sessionID // Include for debugging
       });
