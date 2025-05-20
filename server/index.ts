@@ -1,13 +1,28 @@
+console.log('ALL ENV:', process.env);
+console.log('ENV:', process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+// Load environment variables
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { syncAllDataToSupabase, supabase } from "./supabaseSync";
 import { checkDatabaseStatus, logDatabaseStatus } from "./statusCheck";
+import cors from "cors";
+import path from "path";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.use(
+  cors({
+    origin: app.get("env") === "production" ? false : process.env.VITE_DEV_SERVER_URL,
+  }),
+);
+
+// API request logger middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -38,6 +53,25 @@ app.use((req, res, next) => {
   next();
 });
 
+// Add a status API endpoint directly before registering routes
+app.get("/api/status", async (req, res) => {
+  try {
+    const dbStatus = await checkDatabaseStatus();
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || "unknown",
+      database: dbStatus
+    });
+  } catch (error) {
+    console.error("Status check error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to check status"
+    });
+  }
+});
+
 (async () => {
   const server = await registerRoutes(app);
 
@@ -49,11 +83,22 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // Only setup Vite in development mode and AFTER api routes are registered
   if (app.get("env") === "development") {
-    await setupVite(app, server);
+    // If client is served separately, don't setup Vite
+    if (!process.env.VITE_DEV_SERVER_URL) {
+      await setupVite(app, server);
+    } else {
+      // If VITE_DEV_SERVER_URL is set, we assume client is served separately
+      // Add a catch-all route for non-API requests to redirect to client
+      app.get('*', (req, res) => {
+        if (!req.path.startsWith('/api/')) {
+          res.redirect(process.env.VITE_DEV_SERVER_URL + req.path);
+        } else {
+          res.status(404).json({ message: "API endpoint not found" });
+        }
+      });
+    }
   } else {
     serveStatic(app);
   }
@@ -62,12 +107,6 @@ app.use((req, res, next) => {
   try {
     const dbStatus = await checkDatabaseStatus();
     logDatabaseStatus(dbStatus);
-    
-    if (dbStatus.local.available) {
-      log("Local database connection successful");
-    } else {
-      log("WARNING: Local database connection failed. Application may not function correctly.");
-    }
     
     // Check Supabase configuration
     if (supabase && dbStatus.supabase.available) {
@@ -87,7 +126,7 @@ app.use((req, res, next) => {
             name: err.name
           });
         }
-        log("Application will continue using local storage only");
+        log("Application will continue using mock data when Supabase operations fail");
       }
     } else {
       if (supabase) {
@@ -96,26 +135,25 @@ app.use((req, res, next) => {
           log(`Supabase error: ${dbStatus.supabase.error}`);
         }
       } else {
-        console.warn("Supabase client not available. Data will not be synced to Supabase.");
+        console.warn("Supabase client not available. Using mock data fallback.");
         console.warn("Set SUPABASE_URL and SUPABASE_ANON_KEY environment variables to enable Supabase integration.");
       }
-      log("Application will continue using local database only");
+      log("Application will continue using mock data fallback");
     }
   } catch (error) {
     console.error("Error checking database status:", error);
     log("Application will start with unknown database status");
   }
 
-  // Determine port - use environment variable for production, default to 5000 for development
   // Digital Ocean App Platform expects PORT 8080
-  const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
-  
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`Server started in ${app.get("env")} mode`);
-    log(`Listening on http://0.0.0.0:${port}`);
-  });
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 5002;
+    
+  try {
+    server.listen(port, () => {
+      log(`Server started in ${app.get("env")} mode`);
+      log(`Listening on port ${port}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+  }
 })();

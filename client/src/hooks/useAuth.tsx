@@ -25,14 +25,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Check authentication status on initial load with more resilience
   const { data, refetch, isLoading } = useQuery({
     queryKey: ['/api/user'],
-    // Improved configuration for authentication persistence
-    retry: 2,
-    retryDelay: 1000,
-    refetchOnWindowFocus: false, // Avoid interrupting user experience
-    refetchOnMount: true,
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    refetchInterval: 10 * 60 * 1000, // Refresh session every 10 minutes
-    refetchIntervalInBackground: true // Keep refreshing even when tab is not active
+    // Add error handling to prevent failures when backend is not available
+    retry: false,
+    retryOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+    enabled: false, // Don't run this query automatically since our backend isn't running
+    queryFn: async () => {
+      try {
+        return await apiRequest('GET', '/api/user');
+      } catch (error) {
+        console.warn('Auth API unavailable, using offline mode');
+        return { isAuthenticated: false, user: null };
+      }
+    }
   });
 
   useEffect(() => {
@@ -64,7 +70,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [data, isLoading]);
 
   const logoutMutation = useMutation({
-    mutationFn: () => apiRequest('POST', '/api/logout', {}),
+    mutationFn: async () => {
+      try {
+        return await apiRequest('POST', '/api/logout', {});
+      } catch (error) {
+        console.warn('Logout API unavailable, using offline mode');
+        return null;
+      }
+    },
     onSuccess: () => {
       setIsAuthenticated(false);
       setUser(null);

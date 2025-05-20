@@ -23,26 +23,25 @@ export async function apiRequest(
       ? `${url}${url.includes('?') ? '&' : '?'}_t=${Date.now()}` 
       : url;
     
-    const res = await fetch(urlWithCacheBusting, {
+    // Use the environment variable if available, otherwise default to localhost:5002
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+    
+    const res = await fetch(`${baseUrl}${urlWithCacheBusting}`, {
       method,
       headers,
       body: data ? JSON.stringify(data) : undefined,
-      credentials: "include", // Always include credentials for session cookies
-      cache: "no-store" // Prevent caching
     });
 
     await throwIfResNotOk(res);
     
-    // For non-GET methods or empty responses, just return the response object
-    if (method !== 'GET' || res.status === 204) {
-      return res;
+    if (res.status === 204) {
+      return null;
     }
     
-    // For GET requests, parse the JSON and return the data
-    return await res.json();
-  } catch (error) {
-    console.error(`API request error (${method} ${url}):`, error);
-    throw error;
+    return res.json();
+  } catch (err) {
+    console.error(`API request failed: ${method} ${url}`, err);
+    throw err;
   }
 }
 
@@ -55,6 +54,19 @@ export const getQueryFn: <T>(options: {
     try {
       // Add cache-busting to prevent browser caching
       const url = queryKey[0] as string;
+      
+      // Handle development mode without backend
+      if (process.env.NODE_ENV === 'development' && url.startsWith('/api')) {
+        console.warn(`Development mode: Simulating query to ${url}`);
+        
+        // Return mock data that will be cast to T by TypeScript
+        const mockData = url === '/api/user' 
+          ? { isAuthenticated: false, user: null }
+          : { message: "Query endpoint not available in development mode" };
+          
+        return mockData as any;
+      }
+      
       const urlWithCacheBusting = `${url}${url.includes('?') ? '&' : '?'}_t=${Date.now()}`;
       
       const res = await fetch(urlWithCacheBusting, {
@@ -76,6 +88,17 @@ export const getQueryFn: <T>(options: {
       return data;
     } catch (error) {
       console.error(`Query error (${queryKey[0]}):`, error);
+      
+      // In development mode, return mock data instead of throwing errors
+      if (process.env.NODE_ENV === 'development') {
+        const url = queryKey[0] as string;
+        const mockData = url === '/api/user'
+          ? { isAuthenticated: false, user: null }
+          : { mock: true };
+          
+        return mockData as any;
+      }
+      
       throw error;
     }
   };

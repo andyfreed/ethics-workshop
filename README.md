@@ -16,11 +16,9 @@ A professional React-based Ethics Workshop management system for FPA Chapters, f
 
 - React with TypeScript
 - Express.js backend
-- Supabase database integration
-- Drizzle ORM for database operations
-- PostgreSQL database
+- Supabase for database and authentication
+- Tailwind CSS for styling
 - ShadCN UI components
-- TailwindCSS for styling
 - React Query for data fetching
 - React Hook Form for form management
 - Zod for validation
@@ -30,7 +28,6 @@ A professional React-based Ethics Workshop management system for FPA Chapters, f
 ### Prerequisites
 
 - Node.js 18+ and npm
-- PostgreSQL database
 - Supabase account and project
 
 ### Installation
@@ -47,22 +44,61 @@ A professional React-based Ethics Workshop management system for FPA Chapters, f
    ```
 
 3. Set up environment variables:
-   Create a `.env` file in the root directory with the following variables:
+   Copy `.env.example` to `.env` and update with your Supabase credentials:
    ```
-   DATABASE_URL=postgresql://username:password@localhost:5432/ethics_workshop
    SUPABASE_URL=your_supabase_url
    SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+   
+   # Server Configuration
+   PORT=5002
+   NODE_ENV=development
+   
+   # Client Configuration
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_API_URL=http://localhost:5002
+   VITE_DEV_SERVER_URL=http://localhost:3002
    ```
 
-4. Start the development server:
+4. Start the backend server:
    ```bash
    npm run dev
    ```
 
-5. Set up Supabase:
+5. In a new terminal, start the frontend:
+   ```bash
+   cd client
+   npm run dev
+   ```
+
+6. Set up Supabase:
    - Navigate to `/admin/supabase-setup` in the application
    - Copy and run the SQL script in your Supabase SQL Editor
-   - Use the "Sync Data to Supabase" button to synchronize your local data
+   - Use the "Sync Data to Supabase" button to synchronize data
+
+## Running in Development Mode
+
+The application supports a mock data fallback when Supabase is not configured. This allows for development without requiring an actual Supabase project. However, for full functionality, we recommend setting up Supabase.
+
+## Starting in Production Mode
+
+To build and start the application in production mode:
+
+```bash
+npm run build
+npm start
+```
+
+## Supabase Configuration
+
+The application requires the following Supabase tables:
+- chapter_requests
+- workshop_sessions
+- participants
+- users
+
+The setup script on the admin panel provides the full SQL to create these tables.
 
 ## Usage
 
@@ -81,4 +117,5 @@ A professional React-based Ethics Workshop management system for FPA Chapters, f
 
 ## License
 
+This project is proprietary and confidential.
 This project is proprietary and confidential.

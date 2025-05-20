@@ -1,32 +1,13 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
 import * as schema from "@shared/schema";
 
-neonConfig.webSocketConstructor = ws;
+// This module now only exports the schema
+// All database operations are handled through Supabase
+console.log("Database configured to use Supabase only");
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+// Export the schema for use in other modules
+export { schema };
+
+// If we're in development, log that we're using Supabase only
+if (process.env.NODE_ENV === 'development') {
+  console.log("Running in development mode with Supabase-only configuration");
 }
-
-// Configure the connection pool differently for production vs development
-const poolConfig = process.env.NODE_ENV === 'production' 
-  ? { 
-      connectionString: process.env.DATABASE_URL,
-      max: 20,                 // Maximum number of clients in the pool
-      idleTimeoutMillis: 30000, // How long a client is allowed to remain idle before being closed
-      connectionTimeoutMillis: 2000, // How long to wait for a connection
-      ssl: true                // Enable SSL for production connections
-    }
-  : { 
-      connectionString: process.env.DATABASE_URL,
-      max: 10 // Fewer connections for development
-    };
-
-// Log pool configuration at startup (without sensitive data)
-console.log(`Database pool configured for ${process.env.NODE_ENV} environment with max ${poolConfig.max} connections`);
-
-export const pool = new Pool(poolConfig);
-export const db = drizzle({ client: pool, schema });
