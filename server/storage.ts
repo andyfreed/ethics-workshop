@@ -44,7 +44,17 @@ const mockStorage: {
   chapters: [],
   chapterRequests: [],
   participants: [],
-  users: [],
+  users: [
+    // Add a default admin user for development
+    {
+      id: 1,
+      username: 'admin',
+      password: 'admin',
+      isAdmin: true,
+      is_admin: true,
+      createdAt: new Date().toISOString()
+    }
+  ],
   sessions: []
 };
 

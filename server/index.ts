@@ -16,24 +16,34 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Always allow localhost:5173 in development
-      if (app.get("env") === "development") {
-        callback(null, ["http://localhost:5173"]);
-        return;
-      }
-      // In production, use the VITE_DEV_SERVER_URL or restrict as needed
-      if (process.env.VITE_DEV_SERVER_URL) {
-        callback(null, [process.env.VITE_DEV_SERVER_URL]);
-      } else {
-        callback(null, false);
-      }
-    },
-    credentials: true,
-  })
-);
+// Add explicit CORS headers to all responses
+app.use((req, res, next) => {
+  // Define allowed origins
+  const allowedOrigins = ['http://localhost:5173', 'http://localhost:5002'];
+  const origin = req.headers.origin;
+  
+  // Log the origin being requested for debugging
+  console.log(`Request from origin: ${origin}`);
+  
+  // Only allow origins in our allowedOrigins list
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    // These headers are required for credentials mode
+    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    
+    console.log(`Set CORS headers for origin: ${origin}`);
+  } else {
+    console.log(`Origin not allowed: ${origin}`);
+  }
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
 
 // API request logger middleware
 app.use((req, res, next) => {

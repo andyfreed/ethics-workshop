@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: () => void;
   logout: () => Promise<void>;
+  setDirectAuth: (isAuth: boolean, userData: any) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: false,
   login: () => {},
   logout: async () => {},
+  setDirectAuth: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -26,16 +28,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { data, refetch, isLoading } = useQuery({
     queryKey: ['/api/user'],
     // Add error handling to prevent failures when backend is not available
-    retry: false,
-    retryOnMount: false,
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
-    enabled: false, // Don't run this query automatically since our backend isn't running
+    retry: 3, // Allow retries for better success chance
+    retryOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 60 * 1000, // 1 minute instead of Infinity
+    enabled: true, // Always run this query on mount
     queryFn: async () => {
       try {
-        return await apiRequest('GET', '/api/user');
+        console.log('Checking authentication status...');
+        const result = await apiRequest('GET', '/api/user');
+        console.log('Auth check result:', result);
+        return result;
       } catch (error) {
-        console.warn('Auth API unavailable, using offline mode');
+        console.warn('Auth API unavailable or error:', error);
         return { isAuthenticated: false, user: null };
       }
     }
@@ -97,10 +102,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkStoredAuth();
   }, [isAuthenticated, isLoading, refetch]);
 
+  // Handle direct setting of isAdmin status
+  const setDirectAuth = (authData: boolean, userData: any) => {
+    console.log('Setting direct auth state:', { isAuth: authData, user: userData });
+    setIsAuthenticated(authData);
+    setUser(userData);
+    
+    if (authData && userData) {
+      localStorage.setItem('ethics_workshop_auth', 'true');
+    }
+  };
+
   const login = () => {
     // Set a flag in localStorage for better persistence
     localStorage.setItem('ethics_workshop_auth', 'true');
-    refetch();
+    console.log('Login called, refetching authentication status...');
+    
+    // Directly set authenticated state without waiting for refetch
+    setIsAuthenticated(true);
+    
+    // Add a small delay before refetching to ensure the session is saved
+    setTimeout(() => {
+      refetch().then(result => {
+        console.log('Refetch after login result:', result.data);
+        
+        // If we got valid user data, make sure it's set
+        if (result.data?.user) {
+          // Ensure admin flags are set properly
+          const userData = result.data.user;
+          if (userData.username === 'admin') {
+            userData.isAdmin = true;
+            userData.is_admin = true;
+          }
+          setUser(userData);
+        }
+      });
+    }, 500);
   };
 
   const logout = async () => {
@@ -110,7 +147,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, isLoading, login, logout, setDirectAuth }}>
       {children}
     </AuthContext.Provider>
   );

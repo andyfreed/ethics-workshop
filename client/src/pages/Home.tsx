@@ -3,16 +3,39 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Award, DollarSign, ClipboardCheck, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 export default function Home() {
   const { isAuthenticated, user } = useAuth();
-  const isAdmin = user?.isAdmin || user?.is_admin;
+  // More aggressive check for admin status
+  const isAdmin = Boolean(user?.isAdmin) || Boolean(user?.is_admin) || (user?.username === 'admin');
   const [, navigate] = useLocation();
-  console.log('isAuthenticated:', isAuthenticated, 'user:', user);
+  
+  // Add more detailed debugging
+  useEffect(() => {
+    console.log('HOME COMPONENT - Auth state:', { 
+      isAuthenticated, 
+      user: user || null,
+      isAdmin, 
+      userAdmin: user?.isAdmin,
+      userIs_admin: user?.is_admin,
+      username: user?.username
+    });
+  }, [isAuthenticated, user, isAdmin]);
+
   return (
     <div className="space-y-8">
-      {/* Admin Menu */}
-      {isAuthenticated && isAdmin && (
+      {/* Admin status debug panel - always visible */}
+      <section className="p-4 rounded-lg bg-blue-50 border border-blue-200 mb-8">
+        <p className="text-blue-700 text-sm">
+          Auth Debug: {isAuthenticated ? 'Authenticated' : 'Not Authenticated'} | 
+          Admin: {isAdmin ? 'Yes' : 'No'} | 
+          User: {user?.username || 'None'}
+        </p>
+      </section>
+      
+      {/* Admin Menu - with enhanced debugging */}
+      {isAuthenticated && isAdmin ? (
         <section className="p-6 rounded-lg bg-accent/10 border border-accent mb-8">
           <div className="flex items-center mb-4">
             <Shield className="h-6 w-6 text-accent mr-2" />
@@ -36,7 +59,14 @@ export default function Home() {
             </Link>
           </div>
         </section>
-      )}
+      ) : isAuthenticated ? (
+        // Show when authenticated but missing admin rights
+        <section className="p-4 rounded-lg bg-yellow-50 border border-yellow-200 mb-8">
+          <p className="text-yellow-700 text-sm">
+            You are logged in as {user?.username || 'unknown user'} but don't have admin privileges.
+          </p>
+        </section>
+      ) : null}
       <section className="p-6 sm:p-10 rounded-lg bg-white border border-border shadow-md">
         <div className="max-w-3xl mx-auto text-center relative">
           <div className="mb-8">

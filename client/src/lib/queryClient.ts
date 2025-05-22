@@ -25,21 +25,39 @@ export async function apiRequest(
     
     // Use the environment variable if available, otherwise default to localhost:5002
     const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+    const fullUrl = `${baseUrl}${urlWithCacheBusting}`;
     
-    const res = await fetch(`${baseUrl}${urlWithCacheBusting}`, {
+    // Add detailed logging for auth-related requests
+    if (url.includes('/api/login') || url.includes('/api/user')) {
+      console.log(`API Request: ${method} ${fullUrl}`, data ? { data } : '');
+    }
+    
+    const res = await fetch(fullUrl, {
       method,
       headers,
       body: data ? JSON.stringify(data) : undefined,
       credentials: 'include',
+      mode: 'cors'
     });
 
-    await throwIfResNotOk(res);
-    
-    if (res.status === 204) {
-      return null;
+    // Log the response headers for debugging CORS issues
+    if (url.includes('/api/login') || url.includes('/api/user')) {
+      console.log('Response headers:', {
+        'access-control-allow-origin': res.headers.get('access-control-allow-origin'),
+        'access-control-allow-credentials': res.headers.get('access-control-allow-credentials')
+      });
     }
     
-    return res.json();
+    await throwIfResNotOk(res);
+    
+    const responseData = res.status === 204 ? null : await res.json();
+    
+    // Log auth-related responses
+    if (url.includes('/api/login') || url.includes('/api/user')) {
+      console.log(`API Response: ${method} ${url}`, responseData);
+    }
+    
+    return responseData;
   } catch (err) {
     console.error(`API request failed: ${method} ${url}`, err);
     throw err;
@@ -72,12 +90,21 @@ export const getQueryFn: <T>(options: {
       
       const res = await fetch(urlWithCacheBusting, {
         credentials: "include",
+        mode: 'cors',
         headers: {
           'Accept': 'application/json',
           'Cache-Control': 'no-cache, no-store'
         },
         cache: "no-store"
       });
+
+      // Log the response headers for debugging CORS issues
+      if (url.includes('/api/user')) {
+        console.log('Query Response headers:', {
+          'access-control-allow-origin': res.headers.get('access-control-allow-origin'),
+          'access-control-allow-credentials': res.headers.get('access-control-allow-credentials')
+        });
+      }
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
         console.warn(`Auth error on ${url} - using fallback behavior`);

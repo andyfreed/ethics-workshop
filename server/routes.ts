@@ -40,13 +40,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const MemoryStoreSession = MemoryStore(session);
   app.use(session({
     secret: process.env.SESSION_SECRET || 'ethics-workshop-secret',
-    resave: true, // Changed to true to ensure the session is saved back to the store
-    saveUninitialized: true, // Changed to true to create cookie even if not logged in
+    resave: true, 
+    saveUninitialized: true,
     cookie: { 
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for longer persistence
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: false, // Set to false for local development
+      sameSite: 'none', // Changed from 'lax' to 'none' for cross-origin requests
       path: '/' // Ensure cookie is available on all paths
     },
     store: new MemoryStoreSession({
@@ -92,9 +92,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Check if a user is authenticated and an admin
   function isAdmin(req: Request, res: Response, next: Function) {
-    if (req.isAuthenticated() && (req.user as any)?.isAdmin) {
-      return next();
+    console.log('isAdmin check - user:', req.user);
+    console.log('isAdmin check - authenticated:', req.isAuthenticated());
+    
+    if (req.isAuthenticated()) {
+      const user = req.user as any;
+      const isAdminUser = Boolean(user?.isAdmin) || Boolean(user?.is_admin);
+      
+      console.log('isAdmin check - isAdminUser:', isAdminUser);
+      
+      if (isAdminUser) {
+        return next();
+      }
     }
+    
     res.status(401).json({ message: "Unauthorized" });
   }
   
@@ -159,25 +170,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   app.get('/api/user', (req, res) => {
+    console.log('GET /api/user - isAuthenticated:', req.isAuthenticated());
+    console.log('GET /api/user - session:', {
+      id: req.sessionID,
+      cookie: req.session?.cookie,
+    });
+    console.log('GET /api/user - user:', req.user);
+    
     if (req.isAuthenticated()) {
       // Get session expiration time (if available) for better client handling
       const sessionExpiryTime = req.session.cookie.expires ? 
         new Date(req.session.cookie.expires).getTime() : 
         Date.now() + (24 * 60 * 60 * 1000); // Default 24 hours
 
-      // Patch: Ensure isAdmin is set for admin users
-      let user = req.user;
-      if (user && (user as any).username && (user as any).username.toLowerCase() === 'admin') {
-        user = { ...user, isAdmin: true };
+      // Ensure admin flag is properly set
+      let user = req.user as any;
+      
+      // Fix: check which format of 'admin' is used and update/normalize it
+      if (user) {
+        // Special case for username "admin"
+        if (user.username && user.username.toLowerCase() === 'admin') {
+          user = { 
+            ...user, 
+            isAdmin: true,
+            is_admin: true
+          };
+        }
+        
+        // Make sure at least one admin flag is true if either is true
+        if (user.isAdmin || user.is_admin) {
+          user.isAdmin = true;
+          user.is_admin = true;
+        }
+        
+        // Debugging - log to see what we're returning
+        console.log('User auth response:', { 
+          isAuthenticated: true,
+          user: { 
+            id: user.id, 
+            username: user.username,
+            isAdmin: user.isAdmin || user.is_admin,
+            _raw: user 
+          }
+        });
       }
 
       res.json({ 
         isAuthenticated: true, 
         user, 
         sessionExpires: sessionExpiryTime,
-        sessionID: req.sessionID // Include for debugging
+        sessionID: req.sessionID
       });
     } else {
+      console.log('User not authenticated');
       res.json({ isAuthenticated: false });
     }
   });
