@@ -8,7 +8,7 @@ import {
   SheetContent, 
   SheetTrigger 
 } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, Shield } from "lucide-react";
 
 export default function Header() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -81,6 +81,19 @@ export default function Header() {
                       </span>
                     </Link>
                   ))}
+                  
+                  {/* Admin Login in mobile menu */}
+                  {!isAuthenticated && (
+                    <Link href="/admin">
+                      <span 
+                        className="px-3 py-2 rounded hover:bg-primary/10 cursor-pointer font-medium flex items-center text-foreground"
+                        onClick={() => setOpen(false)}
+                      >
+                        <Shield className="h-4 w-4 mr-2" />
+                        Admin Login
+                      </span>
+                    </Link>
+                  )}
                 </nav>
               </SheetContent>
             </Sheet>
@@ -101,7 +114,18 @@ export default function Header() {
                   Logout
                 </Button>
               </>
-            ) : null}
+            ) : (
+              <Link href="/admin">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="flex items-center text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/10"
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  Admin Login
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

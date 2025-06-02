@@ -86,9 +86,12 @@ export const getQueryFn: <T>(options: {
         return mockData as any;
       }
       
+      // Use the environment variable if available, otherwise default to localhost:5002
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
       const urlWithCacheBusting = `${url}${url.includes('?') ? '&' : '?'}_t=${Date.now()}`;
+      const fullUrl = `${baseUrl}${urlWithCacheBusting}`;
       
-      const res = await fetch(urlWithCacheBusting, {
+      const res = await fetch(fullUrl, {
         credentials: "include",
         mode: 'cors',
         headers: {

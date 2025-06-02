@@ -1,8 +1,9 @@
-console.log('ALL ENV:', process.env);
-console.log('ENV:', process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-// Load environment variables
+// Load environment variables FIRST
 import dotenv from 'dotenv';
 dotenv.config();
+
+console.log('ALL ENV:', process.env);
+console.log('ENV:', process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
@@ -30,7 +31,7 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", origin);
     // These headers are required for credentials mode
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, X-Cache-Control");
     res.header("Access-Control-Allow-Credentials", "true");
     
     console.log(`Set CORS headers for origin: ${origin}`);

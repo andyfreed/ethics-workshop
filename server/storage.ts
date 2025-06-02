@@ -318,6 +318,183 @@ export const storage = {
       mockStorage.sessions.push(mockSession);
       return mockSession;
     }
+  },
+
+  // Workshop Session methods
+  async getWorkshopSessions() {
+    try {
+      if (!supabase) throw new Error('Supabase client not available');
+      
+      const { data, error } = await supabase
+        .from('workshop_sessions')
+        .select('*');
+        
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error("Error fetching workshop sessions:", error);
+      return mockStorage.sessions;
+    }
+  },
+
+  async getWorkshopSessionById(id: number) {
+    try {
+      if (!supabase) throw new Error('Supabase client not available');
+      
+      const { data, error } = await supabase
+        .from('workshop_sessions')
+        .select('*')
+        .eq('id', id)
+        .single();
+        
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error(`Error fetching workshop session ${id}:`, error);
+      return mockStorage.sessions.find(s => s.id === id);
+    }
+  },
+
+  async createWorkshopSession(sessionData: any) {
+    try {
+      if (!supabase) throw new Error('Supabase client not available');
+      
+      const { data, error } = await supabase
+        .from('workshop_sessions')
+        .insert([sessionData])
+        .select()
+        .single();
+        
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error creating workshop session:", error);
+      // For development, create a mock
+      const mockSession = {
+        ...sessionData,
+        id: sessionData.id || Math.floor(Math.random() * 1000),
+        created_at: new Date().toISOString()
+      };
+      mockStorage.sessions.push(mockSession);
+      return mockSession;
+    }
+  },
+
+  async updateWorkshopSessionStatus(id: number, status: string) {
+    try {
+      if (!supabase) throw new Error('Supabase client not available');
+      
+      const { data, error } = await supabase
+        .from('workshop_sessions')
+        .update({ status })
+        .eq('id', id)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error(`Error updating workshop session ${id}:`, error);
+      const sessionIndex = mockStorage.sessions.findIndex(s => s.id === id);
+      if (sessionIndex >= 0) {
+        mockStorage.sessions[sessionIndex].status = status;
+        return mockStorage.sessions[sessionIndex];
+      }
+      return null;
+    }
+  },
+
+  async markWorkshopSessionReported(id: number, reported: boolean) {
+    try {
+      if (!supabase) throw new Error('Supabase client not available');
+      
+      const { data, error } = await supabase
+        .from('workshop_sessions')
+        .update({ reported_to_cfp_board: reported })
+        .eq('id', id)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error(`Error marking workshop session ${id} as reported:`, error);
+      const sessionIndex = mockStorage.sessions.findIndex(s => s.id === id);
+      if (sessionIndex >= 0) {
+        mockStorage.sessions[sessionIndex].reported_to_cfp_board = reported;
+        return mockStorage.sessions[sessionIndex];
+      }
+      return null;
+    }
+  },
+
+  // Participant methods (additional missing methods)
+  async getParticipantsBySessionId(sessionId: number) {
+    try {
+      if (!supabase) throw new Error('Supabase client not available');
+      
+      const { data, error } = await supabase
+        .from('participants')
+        .select('*')
+        .eq('session_id', sessionId);
+        
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error(`Error fetching participants for session ${sessionId}:`, error);
+      return mockStorage.participants.filter(p => p.sessionId === sessionId);
+    }
+  },
+
+  async createParticipant(participantData: any) {
+    try {
+      if (!supabase) throw new Error('Supabase client not available');
+      
+      const { data, error } = await supabase
+        .from('participants')
+        .insert([participantData])
+        .select()
+        .single();
+        
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error creating participant:", error);
+      // For development, create a mock
+      const mockParticipant = {
+        ...participantData,
+        id: participantData.id || Math.floor(Math.random() * 1000),
+        created_at: new Date().toISOString()
+      };
+      mockStorage.participants.push(mockParticipant);
+      return mockParticipant;
+    }
+  },
+
+  async markParticipantsReported(participantIds: number[]) {
+    try {
+      if (!supabase) throw new Error('Supabase client not available');
+      
+      const { data, error } = await supabase
+        .from('participants')
+        .update({ reported_to_cfp_board: true })
+        .in('id', participantIds)
+        .select();
+        
+      if (error) throw error;
+      return data?.length || 0;
+    } catch (error) {
+      console.error("Error marking participants as reported:", error);
+      let count = 0;
+      participantIds.forEach(id => {
+        const participantIndex = mockStorage.participants.findIndex(p => p.id === id);
+        if (participantIndex >= 0) {
+          mockStorage.participants[participantIndex].reported_to_cfp_board = true;
+          count++;
+        }
+      });
+      return count;
+    }
   }
 };
 

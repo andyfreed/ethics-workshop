@@ -40,13 +40,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const MemoryStoreSession = MemoryStore(session);
   app.use(session({
     secret: process.env.SESSION_SECRET || 'ethics-workshop-secret',
-    resave: true, 
-    saveUninitialized: true,
+    resave: false, // Changed from true to false for better performance
+    saveUninitialized: false, // Changed from true to false for security
     cookie: { 
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for longer persistence
       httpOnly: true,
       secure: false, // Set to false for local development
-      sameSite: 'none', // Changed from 'lax' to 'none' for cross-origin requests
+      sameSite: 'lax', // Changed from 'none' to 'lax' for local development
       path: '/' // Ensure cookie is available on all paths
     },
     store: new MemoryStoreSession({
@@ -78,14 +78,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
   
   passport.serializeUser((user: any, done) => {
+    console.log('Serializing user:', user);
     done(null, user.id);
   });
   
   passport.deserializeUser(async (id: number, done) => {
     try {
+      console.log('Deserializing user with ID:', id);
       const user = await storage.getUser(id);
+      console.log('Found user during deserialization:', user);
       done(null, user);
     } catch (err) {
+      console.error('Error during user deserialization:', err);
       done(err);
     }
   });
