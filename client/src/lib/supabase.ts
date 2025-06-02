@@ -5,6 +5,11 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
+// Add debug logging
+console.log('Supabase initialization in client:');
+console.log('VITE_SUPABASE_URL:', supabaseUrl || 'not set');
+console.log('VITE_SUPABASE_ANON_KEY:', supabaseKey ? 'set (starts with ' + supabaseKey.substring(0, 10) + '...)' : 'not set');
+
 // Validate the Supabase URL format - must start with https:// and have a valid domain
 let isValidSupabaseUrl = false;
 if (supabaseUrl) {
